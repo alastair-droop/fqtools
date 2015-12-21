@@ -1,36 +1,47 @@
 #include "fqheader.h"
 
-// int fqfile_readblock_fastq_uncompressed(void *f){
-//     fqfile *f_handle = (fqfile *)f;
-//     int bytes_to_read = fqbuffer_remaining(&(f_handle->buffer));
-//     int bytes_read = (int)fread(f_handle->buffer.data + f_handle->buffer.offset, sizeof(char), bytes_to_read, f_handle->handle);
-//     f_handle->buffer.offset += (size_t)bytes_read;
-//     return bytes_read;
-// }
-//
-int fqfile_init(fqfile f, const char *filename, char type, char mode, size_t buffer_size){
-    // int res;
-    // printf("Running fq_file_init\n");
-    // f->type = type;
-    // f->mode = mode;
-    // f->handle = fopen(filename, "r");
-    // res = fqbuffer_init(&(f->buffer), buffer_size);
-    // if (res != FQ_STATUS_OK){
-    //     fclose(f->handle);
-    //     fqbuffer_free(&(f->buffer));
-    //     return FQ_STATUS_FAIL;
-    // }
-    // f->read_buf = fqfile_readblock_fastq_uncompressed;
+int fqfile_open(fqfile *f, const char *filename, char type, char mode){
+    if(type == FQFILE_TYPE_FASTQ_UNCOMPRESSED) return fqfile_open_file(f, filename, mode);
+    if(type == FQFILE_TYPE_FASTQ_COMPRESSED) return fqfile_open_gzfile(f, filename, mode);
+    return FQ_STATUS_FAIL;
+}
+
+void fqfile_close(fqfile *f){
+    f->close_file(f);
+}
+
+int fqfile_readbuf(fqfile *f, fqbuffer *b){
+    return f->read_buf(f, b);
+}
+
+int fqfile_open_file(fqfile *f, const char *filename, char mode){
+    f->handle = (void*)fopen(filename, "r");
+    f->close_file = fqfile_close_file;
+    f->read_buf = fqfile_readbuf_file;
     return FQ_STATUS_OK;
 }
 
-void fqfile_close(fqfile f){
-    printf("Running fq_file_close\n");
-    // fclose(f->handle);
-    // fqbuffer_free(&(f->buffer));
+int fqfile_open_gzfile(fqfile *f, const char *filename, char mode){
+    f->handle = (void*)gzopen(filename, "r");
+    f->close_file = fqfile_close_gzfile;
+    f->read_buf = fqfile_readbuf_gzfile;
+    return FQ_STATUS_OK;
 }
-//
-// int fqfile_readbuf(fqfile *f){
-//     printf("Running fqfile_readbuf\n");
-//     return f->read_buf(f);
-// }
+
+void fqfile_close_file(void *f){
+    fclose((FILE*)(((fqfile*)f)->handle));
+}
+
+void fqfile_close_gzfile(void *f){
+    gzclose((gzFile*)(((fqfile*)f)->handle));
+}
+
+int fqfile_readbuf_file(void *f, fqbuffer *b){
+    int bytes_read = (int)fread(b->data + b->offset, sizeof(char), fqbuffer_remaining(b), (FILE*)(((fqfile*)f)->handle));
+    return bytes_read;
+}
+
+int fqfile_readbuf_gzfile(void *f, fqbuffer *b){
+    int bytes_read = gzread((gzFile*)(((fqfile*)f)->handle), b->data + b->offset, (int)fqbuffer_remaining(b));
+    return bytes_read;
+}
