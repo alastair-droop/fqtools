@@ -1,20 +1,29 @@
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "fqbuffer.h"
+#include "fqheader.h"
 
 int main(int argc, const char *argv[]){
-    fqbuffer b;
-    size_t buf_size;
+    fqfile f;
     int res;
     
-    buf_size = 100;
-    res = fqbuffer_init(&b, buf_size);
+    // Initialize the input file:
+    res = fqfile_init(f, argv[1], FQFILE_TYPE_FASTQ_UNCOMPRESSED, FQFILE_MODE_READ, 100);
     if(res != FQ_STATUS_OK){
-        fprintf(stderr, "ERROR: Failes to initialize buffer\n");
-        return 1;
+        fprintf(stderr, "ERROR: Failed to load input file\n");
+        fqfile_close(f);
     }
-    fqbuffer_free(&b);
-    fprintf(stdout, "OK\n");
+    
+    // //Do stuff!
+    // printf("Buffer size is %zd\n", f.buffer.size);
+    // printf("Buffer offset is %zd\n", f.buffer.offset);
+    //
+    // //Read in a load of buffer data:
+    // res = fqfile_readbuf(&f);
+    // printf("Read %d bytes\n", res);
+    // f.buffer.data[99] = '\0';
+    // printf("Data: >>%s<<\n", f.buffer.data);
+    //
+    // //Close the input file:
+    // fqfile_close(&f);
+    
+    //All done!
     return 0;
 }

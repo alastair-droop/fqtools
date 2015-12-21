@@ -1,6 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include "fqbuffer.h"
+#include "fqheader.h"
 
 int fqbuffer_init(fqbuffer *b, size_t size){
     printf("Running fqbuffer_init\n");
@@ -17,4 +15,8 @@ void fqbuffer_free(fqbuffer *b){
     free(b->data);
     b->size = 0;
     b->offset = 0;
+}
+
+size_t fqbuffer_remaining(fqbuffer *b){
+    return b->size - b->offset;
 }
