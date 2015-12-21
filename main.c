@@ -6,14 +6,14 @@ int main(int argc, const char *argv[]){
     int res;
     
     //Initialize the buffer:
-    res = fqbuffer_init(&buffer, 100);
+    res = fqbuffer_init(&buffer, 1000000);
     if(res != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: Failed to initialize buffer\n");
         fqbuffer_free(&buffer);
     }
         
     // Initialize the input file:
-    res = fqfile_open(&f, argv[1], FQFILE_TYPE_FASTQ_COMPRESSED, FQFILE_MODE_READ);
+    res = fqfile_open(&f, argv[1], FQFILE_TYPE_FASTQ_UNCOMPRESSED, FQFILE_MODE_READ);
     if(res != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: Failed to load input file\n");
         fqfile_close(&f);
@@ -23,6 +23,8 @@ int main(int argc, const char *argv[]){
     int bytes_read = fqfile_readbuf(&f, &buffer);
     printf("Read %d bytes from file\n", bytes_read);
     printf("Buffer is: >>%s<<\n", buffer.data);
+    printf("End of file?: >>%d<<\n", fqfile_eof(&f));
+    
     
     //All done!
     fqbuffer_free(&buffer);
