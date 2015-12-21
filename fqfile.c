@@ -1,9 +1,9 @@
 #include "fqheader.h"
 
 // The general file manipulations. These delegate to specific callbacks:
-int fqfile_open(fqfile *f, const char *filename, char type, char mode){
-    if(type == FQFILE_TYPE_FASTQ_UNCOMPRESSED) return fqfile_open_file(f, filename, mode);
-    if(type == FQFILE_TYPE_FASTQ_COMPRESSED) return fqfile_open_gzfile(f, filename, mode);
+int fqfile_open(fqfile *f, const char *filename, char format, char type, char mode){
+    if(format == FQFILE_FORMAT_FASTQ_UNCOMPRESSED) return fqfile_open_file(f, filename, type, mode);
+    if(format == FQFILE_FORMAT_FASTQ_COMPRESSED) return fqfile_open_gzfile(f, filename, type, mode);
     return FQ_STATUS_FAIL;
 }
 
@@ -20,7 +20,8 @@ char fqfile_eof(fqfile *f){
 }
 
 // Callbacks for opening files:
-int fqfile_open_file(fqfile *f, const char *filename, char mode){
+
+int fqfile_open_file(fqfile *f, const char *filename, char type, char mode){
     f->handle = (void*)fopen(filename, "r");
     f->close_file = fqfile_close_file;
     f->read_buf = fqfile_readbuf_file;
@@ -28,7 +29,7 @@ int fqfile_open_file(fqfile *f, const char *filename, char mode){
     return FQ_STATUS_OK;
 }
 
-int fqfile_open_gzfile(fqfile *f, const char *filename, char mode){
+int fqfile_open_gzfile(fqfile *f, const char *filename, char type, char mode){
     f->handle = (void*)gzopen(filename, "r");
     f->close_file = fqfile_close_gzfile;
     f->read_buf = fqfile_readbuf_gzfile;

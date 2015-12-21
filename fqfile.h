@@ -4,14 +4,19 @@
 #define FQFILE_MODE_READ 0x01
 #define FQFILE_MODE_WRITE 0x02
 
-// Define the possible file types:
-#define FQFILE_TYPE_FASTQ_UNCOMPRESSED 0x01
-#define FQFILE_TYPE_FASTQ_COMPRESSED 0x02
+// Define the possible data type:
+#define FQFILE_TYPE_PIPE 0x01
+#define FQFILE_TYPE_FILE 0x02
+
+// Define the possible file formats:
+#define FQFILE_FORMAT_FASTQ_UNCOMPRESSED 0x01
+#define FQFILE_FORMAT_FASTQ_COMPRESSED 0x02
 
 // Define the struct that will hold a single file:
 typedef struct{
-    char mode;
-    char type;
+    char mode; // Read or write
+    char format; // File format
+    char type; // File or pipe
     //The file handle (type depends of file type):
     void *handle;
     //Callbacks:
@@ -21,14 +26,14 @@ typedef struct{
 } fqfile;
 
 // Main file handle functions:
-int fqfile_open(fqfile *f, const char *filename, char type, char mode);
+int fqfile_open(fqfile *f, const char *filename, char format, char type, char mode);
 void fqfile_close(fqfile *f);
 int fqfile_readbuf(fqfile *f, fqbuffer *b);
 char fqfile_eof(fqfile *f);
 
 // Callbacks to open different file types:
-int fqfile_open_file(fqfile *f, const char *filename, char mode);
-int fqfile_open_gzfile(fqfile *f, const char *filename, char mode);
+int fqfile_open_file(fqfile *f, const char *filename, char type, char mode);
+int fqfile_open_gzfile(fqfile *f, const char *filename, char type, char mode);
 
 // Callbacks to close different file types:
 void fqfile_close_file(void *f);

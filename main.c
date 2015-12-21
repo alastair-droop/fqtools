@@ -13,7 +13,7 @@ int main(int argc, const char *argv[]){
     }
         
     // Initialize the input file:
-    res = fqfile_open(&f, argv[1], FQFILE_TYPE_FASTQ_UNCOMPRESSED, FQFILE_MODE_READ);
+    res = fqfile_open(&f, argv[1], FQFILE_FORMAT_FASTQ_UNCOMPRESSED, FQFILE_TYPE_FILE, FQFILE_MODE_READ);
     if(res != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: Failed to load input file\n");
         fqfile_close(&f);
