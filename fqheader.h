@@ -6,6 +6,8 @@
 #include <string.h>
 #include <zlib.h>
 
+// Set the function return types:
+typedef unsigned char fqstatus;
 #define FQ_STATUS_OK 0
 #define FQ_STATUS_FAIL 1
 
