@@ -57,7 +57,7 @@ fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename)
         f->handle = gzdopen(dup(fileno(stdin)), "r");
         f->type = FQ_TYPE_PIPE;
         f->eof = fqfile_eof_pipe;
-        f->close = fqfile_close_pipe;
+        f->close = fqfile_close_file_fastq_compressed;
     } else {
         f->handle = (void*)gzopen(filename, "r");
         if(f->handle == NULL) return FQ_STATUS_FAIL;
@@ -100,7 +100,7 @@ fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename
         f->handle = gzdopen(dup(fileno(stdout)), "w");
         f->type = FQ_TYPE_PIPE;
         f->eof = fqfile_eof_pipe;
-        f->close = fqfile_close_pipe;
+        f->close = fqfile_close_file_fastq_compressed;
     } else {
         // Writing to a named file:
         f->handle = (void*)gzopen(filename, "w");
