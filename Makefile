@@ -12,7 +12,6 @@ MODULE_LIST=$(addprefix $(SRC)/, $(MODULES))
 
 EXEC=fqtools
 
-
 .PHONY: all tests clean fqtools
 
 fqtools:
@@ -20,6 +19,10 @@ fqtools:
 
 tests:
 	$(CC) $(CFLAGS) -o $(TEST_BIN)/test-fqbuffer -I$(SRC) -I$(TEST_SRC) $(MODULE_LIST) -lz $(TEST_SRC)/test-fqbuffer.c
+
+scratch:
+	$(CC) $(CFLAGS) -o$(BIN)/fqtest -lz $(MODULE_LIST) $(SRC)/scratch.c
+	
 
 all: fqtools tests
 
