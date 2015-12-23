@@ -5,7 +5,7 @@ int main(int argc, const char *argv[]){
     fqbuffer buffer;
     int res, bytes_read;
     const char *filename_in = NULL;
-    const char *filename_out = "out.fastq";
+    const char *filename_out = NULL;
     fqflag format;
     
     // Initialize the input file:    
@@ -27,16 +27,16 @@ int main(int argc, const char *argv[]){
     }
     
     //Initialize the output file:
-    res = fqfile_open(&f_out, filename_out, FQ_MODE_WRITE, FQ_FORMAT_FASTQ);
+    res = fqfile_open(&f_out, filename_out, FQ_MODE_WRITE, FQ_FORMAT_FASTQ_GZ);
     if(res != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: Failed to load output file\n");
         fqfile_close(&f_in);
         fqfile_close(&f_out);
         return 1;
     }
-    printf("output file mode: %d\n", f_out.mode);
-    printf("output file type: %d\n", f_out.type);
-    printf("output file format: %d\n", f_out.format);
+    fprintf(stderr, "output file mode: %d\n", f_out.mode);
+    fprintf(stderr, "output file type: %d\n", f_out.type);
+    fprintf(stderr, "output file format: %d\n", f_out.format);
     
     //Initialize the buffer:
     res = fqbuffer_init(&buffer, 10);
@@ -56,6 +56,6 @@ int main(int argc, const char *argv[]){
     fqbuffer_free(&buffer);
     fqfile_close(&f_in);
     fqfile_close(&f_out);
-    printf("done\n");
+    fprintf(stderr, "done\n");
     return 0;
 }
