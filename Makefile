@@ -27,5 +27,6 @@ scratch:
 all: fqtools tests
 
 clean:
-	-rm fqtools
+	-rm $(BIN)/fqtools
 	-rm $(TEST_BIN)/test-fqbuffer
+	-rm $(BIN)/fqtest
