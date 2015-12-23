@@ -21,39 +21,40 @@ typedef struct{
     void *handle; // The file handle.
     void (*close)(void *f);
     int (*read)(void *f, fqbuffer *b);
+    int (*write)(void *f, fqbuffer *b);    
     char (*eof)(void *f);
 } fqfile;
-
 
 // Main file handle functions:
 fqstatus fqfile_open(fqfile *f, const char *filename, fqflag mode, fqflag format);
 void fqfile_close(fqfile *f);
 int fqfile_read(fqfile *f, fqbuffer *b);
+int fqfile_write(fqfile *f, fqbuffer *b);
 char fqfile_eof(fqfile *f);
 
 // Callbacks to open different file types:
 fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filename);
 fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename);
-// // int fqfile_open_fastq_write(fqfile *f, const char *filename);
-// // int fqfile_open_fastqgz_write(fqfile *f, const char *filename);
-//
+fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, const char *filename);
+fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename);
+
 // Callbacks to close different file types:
 void fqfile_close_file_fastq_uncompressed(void *f);
 void fqfile_close_file_fastq_compressed(void *f);
 void fqfile_close_pipe(void *f);
 
-// Callbacks to read different file types:
+// Callbacks to read & write different file types:
 int fqfile_read_fastq_uncompressed(void *f, fqbuffer *b);
 int fqfile_read_fastq_compressed(void *f, fqbuffer *b);
-//
+int fqfile_write_fastq_uncompressed(void *f, fqbuffer *b);
+int fqfile_write_fastq_compressed(void *f, fqbuffer *b);
+
 // Callbacks to determine end of file:
 char fqfile_eof_file_fastq_uncompressed(void *f);
 char fqfile_eof_file_fastq_compressed(void *f);
 char fqfile_eof_pipe(void *f);
 
-//
-// Determine the kind of file by its name:
+// Functions to guess the file type by name or magic number:
 fqflag guess_filename_format(const char *filename);
 fqflag guess_file_format(const char *filename);
 fqflag guess_stdin_format();
-//
