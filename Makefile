@@ -22,7 +22,6 @@ tests:
 
 scratch:
 	$(CC) $(CFLAGS) -o$(BIN)/fqtest -lz $(MODULE_LIST) $(SRC)/scratch.c
-	
 
 all: fqtools tests
 
