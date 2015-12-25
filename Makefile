@@ -7,7 +7,7 @@ BIN=.
 TEST_SRC=./tests
 TEST_BIN=./tests
 
-MODULES=fqbuffer.c fqfile.c fqfileset.c
+MODULES=fqbuffer.c fqfile.c fqfileset.c fqparser.c
 MODULE_LIST=$(addprefix $(SRC)/, $(MODULES))
 
 EXEC=fqtools

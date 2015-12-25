@@ -55,25 +55,3 @@ fqstatus fqfileset_read(fqfileset *fs){
     if(fs->paired == FQ_FILESET_PAIRED) fqfilebuffer_read(&(fs->file_2));
     return FQ_STATUS_OK;
 }
-
-
-// fqstatus fqfileset_open_paired(fqfileset *fs, const char *filename_1, const char *filename_2, fqflag mode, fqflag format){
-//     fqstatus result;
-//     result = fqfile_open(&(fs->pair_1), filename_1, mode, format);
-//     if(result != FQ_STATUS_OK) return FQ_STATUS_FAIL;
-//     result = fqfile_open(&(fs->pair_2), filename_2, mode, format);
-//     if(result != FQ_STATUS_OK){
-//         fqfile_close(&(fs->pair_1));
-//         return FQ_STATUS_FAIL;
-//     }
-//     fs->paired = FQ_FILESET_PAIRED;
-//     fs->mode = mode;
-//     fs->format = format;
-//     return FQ_STATUS_OK;
-// }
-//
-// void fqfileset_close(fqfileset *fs){
-//     fqfile_close(&(fs->pair_1));
-//     if (fs->paired == FQ_FILESET_PAIRED) fqfile_close(&(fs->pair_2));
-// }
-//
