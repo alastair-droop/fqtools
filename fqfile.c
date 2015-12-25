@@ -116,7 +116,6 @@ fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename
     return FQ_STATUS_OK;
 }
 
-
 // Callbacks for closing files:
 void fqfile_close_file_fastq_uncompressed(void *f){
     if((FILE*)(((fqfile*)f)->handle) != NULL) fclose((FILE*)(((fqfile*)f)->handle));

@@ -14,7 +14,7 @@ typedef unsigned char fqflag;
 #define FQ_FORMAT_BAM 3
 
 // Define the structure that will describe a single file:
-typedef struct{
+typedef struct {
     fqflag mode; // The mode (read or write)
     fqflag type; // The type (file or pipe)
     fqflag format; // The file format
