@@ -1,6 +1,6 @@
 #include "fqheader.h"
 
-fqstatus fqfilebuffer_open(fqfilebuffer *fb, const char *filename, fqflag mode, fqflag format, size_t buffer_size){
+fqstatus fqfilebuffer_open(fqfilebuffer *fb, const char *filename, fqflag mode, fqflag format, fqbytecount buffer_size){
     fqstatus result;
     result = fqbuffer_init(&(fb->buffer), buffer_size);
     if(result != FQ_STATUS_OK) return FQ_STATUS_FAIL;
@@ -17,10 +17,9 @@ void fqfilebuffer_close(fqfilebuffer *fb){
     fqbuffer_free(&(fb->buffer));
 }
 
-fqstatus fqfilebuffer_read(fqfilebuffer *fb){
+fqbytecount fqfilebuffer_read(fqfilebuffer *fb){
     if(fb->file.mode != FQ_MODE_READ) return FQ_STATUS_FAIL;
-    fqfile_read(&(fb->file), &(fb->buffer));
-    return FQ_STATUS_OK;
+    return fqfile_read(&(fb->file), &(fb->buffer));
 }
 
 fqstatus fqfilebuffer_write(fqfilebuffer *fb){
@@ -50,8 +49,9 @@ void fqfileset_close(fqfileset *fs){
     fqfilebuffer_close(&(fs->file_2));
 }
 
-fqstatus fqfileset_read(fqfileset *fs){
-    fqfilebuffer_read(&(fs->file_1));
-    if(fs->paired == FQ_FILESET_PAIRED) fqfilebuffer_read(&(fs->file_2));
+fqstatus fqfileset_read(fqfileset *fs, fqbytecount *bytes_read_1, fqbytecount *bytes_read_2){
+    *bytes_read_1 = fqfilebuffer_read(&(fs->file_1));
+    if(fs->paired == FQ_FILESET_PAIRED) *bytes_read_2 = fqfilebuffer_read(&(fs->file_2));
+    else *bytes_read_1 = 0;
     return FQ_STATUS_OK;
 }

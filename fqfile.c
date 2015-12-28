@@ -13,7 +13,7 @@ void fqfile_close(fqfile *f){
     if(f->close != NULL) f->close(f);
 }
 
-int fqfile_read(fqfile *f, fqbuffer *b){
+fqbytecount fqfile_read(fqfile *f, fqbuffer *b){
     if(f->read != NULL) return f->read(f, b);
     return 0;
 }
@@ -132,17 +132,17 @@ void fqfile_close_pipe(void *f){
 // Callbacks for reading file data into a buffer:
 // These functions read data directly into the beginning of the buffer, reading a maximum of buffer.size
 // bytes. The resulting buffer is always null-terminated so it can be read like a string later on.
-int fqfile_read_fastq_uncompressed(void *f, fqbuffer *b){
+fqbytecount fqfile_read_fastq_uncompressed(void *f, fqbuffer *b){
     if(((fqfile*)f)->mode != FQ_MODE_READ) return 0; // Check that we're allowed to read from this file
-    int bytes_read = (int)fread(b->data, sizeof(char), b->size, (FILE*)(((fqfile*)f)->handle)); // Read into the buffer
+    fqbytecount bytes_read = (fqbytecount)fread(b->data, sizeof(char), b->size, (FILE*)(((fqfile*)f)->handle)); // Read into the buffer
     b->data[bytes_read] = '\0'; // Mark the end of the read data with a NULL
     b->offset = bytes_read; // Set the offset
     return bytes_read;
 }
 
-int fqfile_read_fastq_compressed(void *f, fqbuffer *b){
+fqbytecount fqfile_read_fastq_compressed(void *f, fqbuffer *b){
     if(((fqfile*)f)->mode != FQ_MODE_READ) return 0; // Check that we're allowed to read from this file
-    int bytes_read = gzread((gzFile*)(((fqfile*)f)->handle), b->data, (int)b->size); // Read into the buffer
+    fqbytecount bytes_read = (fqbytecount)gzread((gzFile*)(((fqfile*)f)->handle), b->data, (int)b->size); // Read into the buffer
     b->data[bytes_read] = '\0'; // Mark the end of the read data with a NULL
     b->offset = bytes_read; // Set the offset    
     return bytes_read;

@@ -11,7 +11,7 @@ typedef struct {
 fqstatus fqfilebuffer_open(fqfilebuffer *fb, const char *filename, fqflag mode, fqflag format, size_t buffer_size);
 void fqfilebuffer_close(fqfilebuffer *fb);
 
-fqstatus fqfilebuffer_read(fqfilebuffer *fb);
+fqbytecount fqfilebuffer_read(fqfilebuffer *fb);
 fqstatus fqfilebuffer_write(fqfilebuffer *fb);
 
 
@@ -25,4 +25,4 @@ typedef struct {
 
 fqstatus fqfileset_open_paired(fqfileset *fs, const char *filename_1, const char *filename_2, fqflag mode, fqflag format, size_t buffer_size);
 void fqfileset_close(fqfileset *fs);
-fqstatus fqfileset_read(fqfileset *fs);
+fqstatus fqfileset_read(fqfileset *fs, fqbytecount *bytes_read_1, fqbytecount *bytes_read_2);

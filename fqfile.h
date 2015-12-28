@@ -20,7 +20,7 @@ typedef struct {
     fqflag format; // The file format
     void *handle; // The file handle.
     void (*close)(void *f);
-    int (*read)(void *f, fqbuffer *b);
+    fqbytecount (*read)(void *f, fqbuffer *b);
     int (*write)(void *f, fqbuffer *b);    
     char (*eof)(void *f);
 } fqfile;
@@ -28,7 +28,7 @@ typedef struct {
 // Main file handle functions:
 fqstatus fqfile_open(fqfile *f, const char *filename, fqflag mode, fqflag format);
 void fqfile_close(fqfile *f);
-int fqfile_read(fqfile *f, fqbuffer *b);
+fqbytecount fqfile_read(fqfile *f, fqbuffer *b);
 int fqfile_write(fqfile *f, fqbuffer *b);
 char fqfile_eof(fqfile *f);
 
@@ -44,8 +44,8 @@ void fqfile_close_file_fastq_compressed(void *f);
 void fqfile_close_pipe(void *f);
 
 // Callbacks to read & write different file types:
-int fqfile_read_fastq_uncompressed(void *f, fqbuffer *b);
-int fqfile_read_fastq_compressed(void *f, fqbuffer *b);
+fqbytecount fqfile_read_fastq_uncompressed(void *f, fqbuffer *b);
+fqbytecount fqfile_read_fastq_compressed(void *f, fqbuffer *b);
 int fqfile_write_fastq_uncompressed(void *f, fqbuffer *b);
 int fqfile_write_fastq_compressed(void *f, fqbuffer *b);
 

@@ -1,10 +1,10 @@
 #include "fqheader.h"
 
 // Create the fqbuffer object:
-int fqbuffer_init(fqbuffer *b, size_t size){
+fqstatus fqbuffer_init(fqbuffer *b, fqbytecount size){
     b->size = 0;
     b->offset = 0;
-    b->data = (char*)malloc((size + 1) * sizeof(char));
+    b->data = (char*)malloc(((size_t)size + 1) * sizeof(char));
     if(b->data == NULL) return FQ_STATUS_FAIL;
     b->data[size] = '\0';
     b->size = size;
@@ -21,18 +21,18 @@ void fqbuffer_free(fqbuffer *b){
 // Reset an fqbuffer object by clearing its contents and
 // setting the offset to the start:
 void fqbuffer_reset(fqbuffer *b){
-	memset(b->data, 0, b->size);
+	memset(b->data, 0, (size_t)(b->size));
 	b->offset = 0;
 }
 
 // Return the remaining space in the buffer as it is currently sized:
-size_t fqbuffer_remaining(fqbuffer *b){
+fqbytecount fqbuffer_remaining(fqbuffer *b){
     return b->size - b->offset;
 }
 
 // Add extra space to the end of the buffer:
-int fqbuffer_extend(fqbuffer *b, size_t extra){
-	b->data = (char*)realloc(b->data, ((b->size + 1)* sizeof(char)) + (extra * sizeof(char)));
+fqstatus fqbuffer_extend(fqbuffer *b, fqbytecount extra){
+	b->data = (char*)realloc(b->data, (size_t)((b->size + 1)* sizeof(char)) + (size_t)(extra * sizeof(char)));
 	if(b->data == NULL){
 		fqbuffer_free(b);
 		return FQ_STATUS_FAIL;
@@ -43,17 +43,17 @@ int fqbuffer_extend(fqbuffer *b, size_t extra){
 }
 
 // Add string data to the buffer, extending if necessary:
-int fqbuffer_append(fqbuffer *b, char *data, size_t size){
+fqstatus fqbuffer_append(fqbuffer *b, char *data, fqbytecount size){
 	if(size > fqbuffer_remaining(b)){
 		if(fqbuffer_extend(b, size - fqbuffer_remaining(b)) != 0) return FQ_STATUS_FAIL;
 	}
-	memcpy(b->data + (b->offset * sizeof(char)), data, size);
+	memcpy(b->data + (b->offset * sizeof(char)), data, (size_t)size);
 	b->offset += size;
 	return FQ_STATUS_OK;
 }
 
 // Add a single character to the buffer, extending if necessary:
-int fqbuffer_appendchar(fqbuffer *b, char c){
+fqstatus fqbuffer_appendchar(fqbuffer *b, char c){
 	if(fqbuffer_remaining(b) == 0){
 		if(fqbuffer_extend(b, 1) != 0) return FQ_STATUS_FAIL;
 	}
