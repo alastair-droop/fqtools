@@ -55,3 +55,10 @@ fqstatus fqfileset_read(fqfileset *fs, fqbytecount *bytes_read_1, fqbytecount *b
     else *bytes_read_1 = 0;
     return FQ_STATUS_OK;
 }
+
+fqstatus fqfileset_write(fqfileset *fs, fqbytecount *bytes_written_1, fqbytecount *bytes_written_2){
+    *bytes_written_1 = fqfilebuffer_write(&(fs->file_1));
+    if(fs->paired == FQ_FILESET_PAIRED) *bytes_written_2 = fqfilebuffer_write(&(fs->file_2));
+    else *bytes_written_2 = 0;
+    return FQ_STATUS_OK;
+}

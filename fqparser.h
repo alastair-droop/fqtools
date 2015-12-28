@@ -16,22 +16,36 @@
 #define FQ_PARSER_ENTRY_QUALITY 2
 #define FQ_PARSER_ENTRY_DONE 3
 
+// Define the possible error types:
+#define FQ_ERROR_UNKNOWN 0
+#define FQ_ERROR_MISSING_HEADER 1
+#define FQ_ERROR_INVALID_SEQUENCE_CHARACTER 2
+#define FQ_ERROR_INVALID_QUALITY_CHARACTER 3
+#define FQ_ERROR_INCOMPLETE_FINAL_READ 4
+#define FQ_ERROR_PAIR_MISMATCH 5
+#define FQ_ERROR_FILE 6
+
+
 //Define the parser callback struct:
 typedef struct {
 	char interrupt;
 	void (*startRead)(void *user);
 	void (*endRead)(void *user);
-	void (*header1Block)(void *user, char *block, size_t n, char final);
+	void (*header1Block)(void *user, fqbuffer *block, size_t n, char final);
 	void (*header2Block)(void *user, char *block, size_t n, char final);
 	void (*sequenceBlock)(void *user, char *block, size_t n, char final);
 	void (*qualityBlock)(void *user, char *block, size_t n, char final);
 	void (*error)(void *user, char error_type, size_t line, char character);
+    void (*readBuffer)(fqbytecount *bytes_read);
+    void (*writeBuffer)();
 } fqparser_callbacks;
 
 typedef struct {
     // IO:
-    fqfileset *fs_in;
-    fqfileset *fs_out;
+    fqbuffer *buffer_in;
+    fqbuffer *buffer_out;
+    // fqfileset *fs_in;
+    // fqfileset *fs_out;
     // Permanent state:
     void *user;
     fqparser_callbacks *callbacks;
@@ -40,18 +54,25 @@ typedef struct {
     char entry_point;
     char error;
     // Temporary state:
-    char current_state;
     char current_character;
+    char current_state;
+    fqbytecount index_buffer_in;
+    fqbytecount length_buffer_in;
     size_t line_number;
-    size_t characters_read;
-    size_t sequence_length;
-    size_t quality_length;
+    
+    // fqbytecount buffer_in_position;
+    // fqbytecount buffer_in_size;
+    // char current_state;
+    // char current_character;
+    // size_t characters_read;
+    // size_t sequence_length;
+    // size_t quality_length;
 } fqparser;
 
-fqstatus fqparser_init(fqparser *p, fqfileset *fs_in, fqfileset *fs_out, fqparser_callbacks *callbacks, void *user);
+fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user);
 void fqparser_free(fqparser *p);
 
-fqstatus fqparser_step(fqparser *p);
+char fqparser_step(fqparser *p);
 //
 // char fqparser_step(fqparser *p, fqfile *f);
 // char fqparser_pairstep(fqparser *p1, fqparser *p2, fqfile *f1, fqfile *f2);
