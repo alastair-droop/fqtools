@@ -18,7 +18,7 @@ fqbytecount fqfile_read(fqfile *f, fqbuffer *b){
     return 0;
 }
 
-int fqfile_write(fqfile *f, fqbuffer *b){
+fqbytecount fqfile_write(fqfile *f, fqbuffer *b){
     if(f->write != NULL) return f->write(f, b);
     return 0;
 }
@@ -150,17 +150,17 @@ fqbytecount fqfile_read_fastq_compressed(void *f, fqbuffer *b){
 
 // Callbacks to write buffer data to file:
 // These functions write from the start of the buffer to the position marked by b.offset.
-int fqfile_write_fastq_uncompressed(void *f, fqbuffer *b){
+fqbytecount fqfile_write_fastq_uncompressed(void *f, fqbuffer *b){
     if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
     if(b->offset == 0) return 0; // No point writing anything if there is nothing to write!
-    int bytes_written = (int)fwrite(b->data, sizeof(char), b->offset, (FILE*)(((fqfile*)f)->handle));
+    int bytes_written = (fqbytecount)fwrite(b->data, sizeof(char), b->offset, (FILE*)(((fqfile*)f)->handle));
     return bytes_written;
 }
 
-int fqfile_write_fastq_compressed(void *f, fqbuffer *b){
+fqbytecount fqfile_write_fastq_compressed(void *f, fqbuffer *b){
     if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
     if(b->offset == 0) return 0; // No point writing anything if there is nothing to write!
-    int bytes_written = (int)gzwrite((gzFile*)(((fqfile*)f)->handle), b->data, (unsigned int)b->offset);
+    int bytes_written = (fqbytecount)gzwrite((gzFile*)(((fqfile*)f)->handle), b->data, (unsigned int)b->offset);
     return bytes_written;
 }
 
