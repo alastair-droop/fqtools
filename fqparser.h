@@ -25,16 +25,19 @@
 #define FQ_ERROR_PAIR_MISMATCH 5
 #define FQ_ERROR_FILE 6
 
+// Define the parser step values:
+#define FQ_PARSER_INCOMPLETE 0
+#define FQ_PARSER_COMPLETE 1
 
 //Define the parser callback struct:
 typedef struct {
 	char interrupt;
 	void (*startRead)(void *user);
 	void (*endRead)(void *user);
-	void (*header1Block)(void *user, fqbuffer *block, size_t n, char final);
-	void (*header2Block)(void *user, char *block, size_t n, char final);
-	void (*sequenceBlock)(void *user, char *block, size_t n, char final);
-	void (*qualityBlock)(void *user, char *block, size_t n, char final);
+	void (*header1Block)(void *user, fqbuffer *block, char final);
+	void (*header2Block)(void *user, fqbuffer *block, char final);
+	void (*sequenceBlock)(void *user, fqbuffer *block, char final);
+	void (*qualityBlock)(void *user, fqbuffer *block, char final);
 	void (*error)(void *user, char error_type, size_t line, char character);
     void (*readBuffer)(fqbytecount *bytes_read);
     void (*writeBuffer)();
@@ -54,6 +57,8 @@ typedef struct {
     char entry_point;
     char error;
     // Temporary state:
+    fqbytecount sequence_length;
+    fqbytecount quality_length;
     char current_character;
     char current_state;
     fqbytecount index_buffer_in;
@@ -63,9 +68,7 @@ typedef struct {
     // fqbytecount buffer_in_position;
     // fqbytecount buffer_in_size;
     // char current_state;
-    // char current_character;
     // size_t characters_read;
-    // size_t sequence_length;
     // size_t quality_length;
 } fqparser;
 
