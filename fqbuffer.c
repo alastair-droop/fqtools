@@ -61,3 +61,11 @@ fqstatus fqbuffer_appendchar(fqbuffer *b, char c){
     b->offset ++;
     return FQ_STATUS_OK;
 }
+
+// Add a single character, but don't extend:
+fqstatus fqbuffer_appendchar_noextend(fqbuffer *b, char c){
+    if(fqbuffer_remaining(b) == 0) return FQ_STATUS_FAIL;
+    b->data[b->offset] = c;
+    b->offset ++;
+    return FQ_STATUS_OK;
+}

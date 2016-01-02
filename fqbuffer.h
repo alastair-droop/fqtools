@@ -15,3 +15,5 @@ fqstatus fqbuffer_extend(fqbuffer *b, fqbytecount extra);
 
 fqstatus fqbuffer_append(fqbuffer *b, char *data, fqbytecount size);
 fqstatus fqbuffer_appendchar(fqbuffer *b, char c);
+
+fqstatus fqbuffer_appendchar_noextend(fqbuffer *b, char c);

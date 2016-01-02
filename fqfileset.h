@@ -14,7 +14,6 @@ void fqfilebuffer_close(fqfilebuffer *fb);
 fqbytecount fqfilebuffer_read(fqfilebuffer *fb);
 fqstatus fqfilebuffer_write(fqfilebuffer *fb);
 
-
 typedef struct {
     fqflag mode;
     fqflag paired;
