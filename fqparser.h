@@ -46,8 +46,6 @@ typedef struct {
     // IO:
     fqbuffer *buffer_in;
     fqbuffer *buffer_out;
-    // fqfileset *fs_in;
-    // fqfileset *fs_out;
     // Permanent state:
     void *user;
     fqparser_callbacks *callbacks;
@@ -63,20 +61,9 @@ typedef struct {
     fqbytecount index_buffer_in;
     fqbytecount length_buffer_in;
     size_t line_number;
-    
-    // fqbytecount buffer_in_position;
-    // fqbytecount buffer_in_size;
-    // char current_state;
-    // size_t characters_read;
-    // size_t quality_length;
 } fqparser;
 
 fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user);
 void fqparser_free(fqparser *p);
 
 char fqparser_step(fqparser *p);
-//
-// char fqparser_step(fqparser *p, fqfile *f);
-// char fqparser_pairstep(fqparser *p1, fqparser *p2, fqfile *f1, fqfile *f2);
-//
-// #endif /* defined(__readTest__fqparser__) */
