@@ -40,7 +40,6 @@ typedef struct {
     void (*qualityBlock)(void *user, fqbuffer *block, char final);
     void (*error)(void *user, char error_type, size_t line, char character);
     void (*readBuffer)(fqbytecount *bytes_read);
-    void (*writeBuffer)();
 } fqparser_callbacks;
 
 typedef struct {
