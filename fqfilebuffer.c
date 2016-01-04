@@ -22,8 +22,7 @@ fqbytecount fqfilebuffer_read(fqfilebuffer *fb){
     return fqfile_read(&(fb->file), &(fb->buffer));
 }
 
-fqstatus fqfilebuffer_write(fqfilebuffer *fb){
-    if(fb->file.mode != FQ_MODE_WRITE) return FQ_STATUS_FAIL;
-    fqfile_write(&(fb->file), &(fb->buffer));
-    return FQ_STATUS_OK;
+fqbytecount fqfilebuffer_write(fqfilebuffer *fb){
+    if(fb->file.mode != FQ_MODE_WRITE) return 0;
+    return fqfile_write(&(fb->file), &(fb->buffer));
 }

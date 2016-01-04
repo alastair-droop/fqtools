@@ -9,4 +9,4 @@ fqstatus fqfilebuffer_open(fqfilebuffer *fb, const char *filename, fqflag mode, 
 void fqfilebuffer_close(fqfilebuffer *fb);
 
 fqbytecount fqfilebuffer_read(fqfilebuffer *fb);
-fqstatus fqfilebuffer_write(fqfilebuffer *fb);
+fqbytecount fqfilebuffer_write(fqfilebuffer *fb);

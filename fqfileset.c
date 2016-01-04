@@ -34,9 +34,24 @@ fqstatus fqfileset_read(fqfileset *fs, fqbytecount *bytes_read_1, fqbytecount *b
     return FQ_STATUS_OK;
 }
 
-fqstatus fqfileset_write(fqfileset *fs, fqbytecount *bytes_written_1, fqbytecount *bytes_written_2){
-    *bytes_written_1 = fqfilebuffer_write(&(fs->file_1));
-    if(fs->paired == FQ_FILESET_PAIRED) *bytes_written_2 = fqfilebuffer_write(&(fs->file_2));
-    else *bytes_written_2 = 0;
-    return FQ_STATUS_OK;
+fqbuffer* fqfileset_getBuffer(fqfileset *fs, char pair){
+    if(pair == FQ_FILESET_PAIR_1) return &(fs->file_1.buffer);
+    return &(fs->file_2.buffer);
+}
+
+void fqfileset_write(fqfileset *fs){
+    fqfilebuffer_write(&(fs->file_1));
+    if(fs->paired == FQ_FILESET_PAIRED) fqfilebuffer_write(&(fs->file_2));
+}
+
+fqstatus fqfileset_appendchar(fqfileset *fs, char pair, char c){
+    if(pair == FQ_FILESET_PAIR_1) return fqbuffer_appendchar(&(fs->file_1.buffer), c);
+    if(pair == FQ_FILESET_PAIR_2) return fqbuffer_appendchar(&(fs->file_2.buffer), c);
+    return FQ_STATUS_FAIL;
+}
+
+fqstatus fqfileset_append(fqfileset *fs, char pair, char *data, fqbytecount size){
+    if(pair == FQ_FILESET_PAIR_1) return fqbuffer_append(&(fs->file_1.buffer), data, size);
+    if(pair == FQ_FILESET_PAIR_2) return fqbuffer_append(&(fs->file_2.buffer), data, size);
+    return FQ_STATUS_FAIL;
 }
