@@ -29,3 +29,4 @@ clean:
 	-rm $(BIN)/fqtools
 	-rm $(TEST_BIN)/test-fqbuffer
 	-rm $(BIN)/fqtest
+	-rm $(BIN)/out_*.fastq
