@@ -46,6 +46,7 @@ char fqparser_step(fqparser *p){
     switch(p->entry_point){
         case FQ_PARSER_ENTRY_START: goto entry_start;
         case FQ_PARSER_ENTRY_LOOP: goto entry_loop;
+        case FQ_PARSER_ENTRY_QUALITY: goto entry_quality;        
         case FQ_PARSER_ENTRY_DONE: goto entry_done;
     }
 entry_start:
@@ -159,7 +160,37 @@ entry_start:
 					}
 					break;
                 } // End of processing FQ_PARSER_STATE_HEADER_2 state.
-                case FQ_PARSER_STATE_QUALITY:{} // End of processing FQ_PARSER_STATE_QUALITY state.
+                case FQ_PARSER_STATE_QUALITY:{
+					if(p->current_character != '\n'){
+						p->output_buffer[p->output_buffer_offset] = p->current_character;
+						p->output_buffer_offset ++;
+                        // // Check the quality character range:
+                        // if((p->current_character < p->file_offset) || (p->current_character > 126)){
+                        //     p->callbacks->error(p->user, FQ_ERROR_INVALID_QUALITY_CHARACTER, p->line_number, p->current_character);
+                        //     p->entry_point = ENTRY_DONE;
+                        //     p->error = 1;
+                        //     return 1;
+                        // }
+						p->quality_length ++;
+						if(p->output_buffer_offset == p->output_buffer_max){
+							p->callbacks->qualityBlock(p->user, p->output_buffer, p->output_buffer_offset, 0);
+							p->output_buffer_offset = 0;
+							p->entry_point = FQ_PARSER_ENTRY_LOOP;
+							return 0;
+						}
+					}
+					if(p->quality_length == p->sequence_length){
+						p->callbacks->qualityBlock(p->user, p->output_buffer, p->output_buffer_offset, 1);
+						p->entry_point = FQ_PARSER_ENTRY_QUALITY;
+						return 0;
+entry_quality:
+						p->output_buffer_offset = 0;
+						p->current_state = FQ_PARSER_STATE_INIT;
+						p->callbacks->endRead(p->user);
+						p->entry_point = FQ_PARSER_ENTRY_LOOP;
+						return 0;
+					}
+                } // End of processing FQ_PARSER_STATE_QUALITY state.
             } // End of the state switch
 entry_loop:;
         } // End of processing the chunk.
