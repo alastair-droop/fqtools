@@ -32,13 +32,13 @@
 //Define the parser callback struct:
 typedef struct {
     char interrupt;
-    void (*startRead)(void *user);
-    void (*endRead)(void *user);
-    void (*header1Block)(void *user, fqbuffer *block, char final);
-    void (*header2Block)(void *user, fqbuffer *block, char final);
-    void (*sequenceBlock)(void *user, fqbuffer *block, char final);
-    void (*qualityBlock)(void *user, fqbuffer *block, char final);
-    void (*error)(void *user, char error_type, size_t line, char character);
+    // void (*startRead)(void *user);
+    // void (*endRead)(void *user);
+    // void (*header1Block)(void *user, fqbuffer *block, char final);
+    // void (*header2Block)(void *user, fqbuffer *block, char final);
+    // void (*sequenceBlock)(void *user, fqbuffer *block, char final);
+    // void (*qualityBlock)(void *user, fqbuffer *block, char final);
+    // void (*error)(void *user, char error_type, size_t line, char character);
     fqbytecount (*readBuffer)(char *b, fqbytecount b_size);
 } fqparser_callbacks;
 

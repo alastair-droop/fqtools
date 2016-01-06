@@ -14,11 +14,11 @@ typedef unsigned char fqstatus;
 // Define a type for a number of bytes read:
 typedef unsigned long int fqbytecount;
 
-#include "fqbuffer.h"
-#include "fqfile.h"
-#include "fqfilebuffer.h"
-#include "fqfileset.h"
+// #include "fqbuffer.h"
+// #include "fqfile.h"
+// #include "fqfilebuffer.h"
+// #include "fqfileset.h"
 #include "fqparser.h"
-#include "fqgenerics.h"
+// #include "fqgenerics.h"
 
 #endif
