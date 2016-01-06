@@ -1,6 +1,6 @@
 #include "fqheader.h"
 
-fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user){
+fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, void *user){
     p->input_buffer = (char*)malloc(in_bufsize * sizeof(char));
     if(p->input_buffer == NULL) return FQ_STATUS_FAIL;
     p->output_buffer = (char*)malloc((out_bufsize + 1) * sizeof(char));
@@ -14,7 +14,7 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
         free(p->output_buffer);
         return FQ_STATUS_FAIL;
     }
-    memset(p->valid_sequence_characters, 1, 256);
+    fqparser_setValidSequenceCharacters(p, seq_flags);
     p->valid_quality_characters = (char*)malloc(256 * sizeof(char));
     if(p->output_buffer == NULL){
         free(p->input_buffer);
@@ -22,7 +22,7 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
         free(p->valid_sequence_characters);
         return FQ_STATUS_FAIL;
     }
-    memset(p->valid_quality_characters, 1, 256);
+    fqparser_setValidQualityCharacters(p, encoding);
     p->input_buffer_size = 0;
     p->input_buffer_max = in_bufsize;
     p->input_buffer_offset = 0;
@@ -47,6 +47,7 @@ void fqparser_free(fqparser *p){
 }
 
 void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags){
+    memset(p->valid_sequence_characters, 1, 256);
 	char dna = (flags & (1 << 6)) != 0;
 	char rna = (flags & (1 << 5)) != 0;
 	char ambiguous = (flags & (1 << 4)) != 0;

@@ -69,7 +69,7 @@ typedef struct {
 
 // fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user);
 // fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, char *input_buffer, char *output_buffer, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user);
-fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user);
+fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, void *user);
 void fqparser_free(fqparser *p);
 
 void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags);
