@@ -1,7 +1,6 @@
 #include "fqheader.h"
 
 // Define the file mode flag bits:
-typedef unsigned char fqflag;
 #define FQ_MODE_READ 0
 #define FQ_MODE_WRITE 1
 

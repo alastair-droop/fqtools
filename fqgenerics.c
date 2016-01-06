@@ -5,31 +5,28 @@ void fq_generic_read(void *user){}
 void fq_generic_block(void *user, char *block, fqbytecount block_n, char final){}
 
 void fq_generic_error(void *user, char error_type, size_t line, char character){
-    char *message;
     switch(error_type){
         case FQ_ERROR_MISSING_HEADER:
-            message = "expected header sequence";
+            fprintf(stderr, "ERROR [line %lu]: expected header sequence\n", line);
             break;
         case FQ_ERROR_INVALID_SEQUENCE_CHARACTER:
-            message = "invalid sequence character";
+            fprintf(stderr, "ERROR [line %lu]: invalid sequence character (%c)\n", line, character);
             break;
         case FQ_ERROR_INVALID_QUALITY_CHARACTER:
-            message = "invalid quality character";
+            fprintf(stderr, "ERROR [line %lu]: invalid quality character (%c)\n", line, character);
             break;
         case FQ_ERROR_INCOMPLETE_FINAL_READ:
-            message = "incomplete final read";
+            fprintf(stderr, "ERROR [line %lu]: incomplete final read\n", line);
             break;
         case FQ_ERROR_PAIR_MISMATCH:
-            message = "file pair read count mismatch";
+            fprintf(stderr, "ERROR: file pair read count mismatch\n");
             break;
         case FQ_ERROR_FILE:
-            message = "file read error";
+            fprintf(stderr, "ERROR: file read error\n");
             break;
         default:
-            message = "general error";
+            fprintf(stderr, "ERROR: general error\n");
     }
-    if(line == 0) fprintf(stderr, "ERROR: %s\n", message);
-    else fprintf(stderr, "ERROR [line %ld]: %s\n", line, message);
 }
 
 void set_generic_callbacks(fqparser_callbacks *callbacks){

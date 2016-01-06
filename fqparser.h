@@ -53,24 +53,17 @@ typedef struct {
     fqbytecount output_buffer_offset;
     //Callbacks:
     fqparser_callbacks *callbacks;
-    // // IO:
-    // fqbuffer *buffer_in;
-    // fqbuffer *buffer_out;
-    // // Permanent state:
+    // Permanent state:
     void *user;
-    // fqparser_callbacks *callbacks;
-    // // fqfileset *output_fileset;
-    // // char *valid_chars;
-    char error;
-
+    char *valid_sequence_characters;
+    char *valid_quality_characters;
     // Temporary state:
     fqbytecount sequence_length;
     fqbytecount quality_length;
     char entry_point;
     char current_character;
     char current_state;
-    // fqbytecount index_buffer_in;
-    // fqbytecount length_buffer_in;
+    char error;
     fqbytecount line_number;
 } fqparser;
 
@@ -78,5 +71,10 @@ typedef struct {
 // fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, char *input_buffer, char *output_buffer, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user);
 fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user);
 void fqparser_free(fqparser *p);
+
+void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags);
+void fqparser_setValidQualityCharacters(fqparser *p);
+void fqparser_show_sequence_characters(fqparser *p);
+
 
 char fqparser_step(fqparser *p);
