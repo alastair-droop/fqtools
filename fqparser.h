@@ -39,31 +39,45 @@ typedef struct {
     void (*sequenceBlock)(void *user, fqbuffer *block, char final);
     void (*qualityBlock)(void *user, fqbuffer *block, char final);
     void (*error)(void *user, char error_type, size_t line, char character);
-    void (*readBuffer)(fqbytecount *bytes_read);
+    fqbytecount (*readBuffer)(char *b, fqbytecount b_size);
 } fqparser_callbacks;
 
 typedef struct {
-    // IO:
-    fqbuffer *buffer_in;
-    fqbuffer *buffer_out;
-    // Permanent state:
-    void *user;
+    //IO:
+    char *input_buffer;
+    fqbytecount input_buffer_size;
+    fqbytecount input_buffer_max_size;    
+    fqbytecount input_buffer_offset;
+    char *output_buffer;
+    fqbytecount output_buffer_size;
+    fqbytecount output_buffer_max_size;
+    fqbytecount output_buffer_offset;
+    //Callbacks:
     fqparser_callbacks *callbacks;
-    // fqfileset *output_fileset;
-    // char *valid_chars;
-    char entry_point;
-    char error;
+    // // IO:
+    // fqbuffer *buffer_in;
+    // fqbuffer *buffer_out;
+    // // Permanent state:
+    void *user;
+    // fqparser_callbacks *callbacks;
+    // // fqfileset *output_fileset;
+    // // char *valid_chars;
+    // char entry_point;
+    // char error;
+
     // Temporary state:
-    fqbytecount sequence_length;
-    fqbytecount quality_length;
+    // fqbytecount sequence_length;
+    // fqbytecount quality_length;
     char current_character;
-    char current_state;
-    fqbytecount index_buffer_in;
-    fqbytecount length_buffer_in;
-    size_t line_number;
+    // char current_state;
+    // fqbytecount index_buffer_in;
+    // fqbytecount length_buffer_in;
+    // size_t line_number;
 } fqparser;
 
-fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user);
+// fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user);
+// fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, char *input_buffer, char *output_buffer, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user);
+fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user);
 void fqparser_free(fqparser *p);
 
 char fqparser_step(fqparser *p);
