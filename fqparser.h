@@ -49,7 +49,6 @@ typedef struct {
     fqbytecount input_buffer_max;    
     fqbytecount input_buffer_offset;
     char *output_buffer;
-    fqbytecount output_buffer_size;
     fqbytecount output_buffer_max;
     fqbytecount output_buffer_offset;
     //Callbacks:
