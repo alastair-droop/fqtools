@@ -65,8 +65,8 @@ typedef struct {
     char error;
 
     // Temporary state:
-    // fqbytecount sequence_length;
-    // fqbytecount quality_length;
+    fqbytecount sequence_length;
+    fqbytecount quality_length;
     char entry_point;
     char current_character;
     char current_state;

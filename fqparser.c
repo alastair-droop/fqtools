@@ -18,6 +18,8 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
     p->user = user;
     p->callbacks = callbacks;
     p->entry_point = FQ_PARSER_ENTRY_START;
+    p->sequence_length = 0;
+    p->quality_length = 0;
     p->line_number = 0;
     return FQ_STATUS_OK;
 }
@@ -86,14 +88,14 @@ entry_start:
                     return 1;
                 } // End of processing FQ_PARSER_STATE_INIT state.
                 case FQ_PARSER_STATE_HEADER_1:{
-                    // if (p->current_character == '\n'){
-                    //     p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_pos, 1);
-                    //     p->output_buffer_pos = 0;
-                    //     p->current_state = STATE_SEQUENCE;
-                    //     p->sequence_length = 0;
-                    //     p->entry_point = ENTRY_LOOP;
-                    //     return 0;
-                    // } else {
+                    if (p->current_character == '\n'){
+                        p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_offset, 1);
+                        p->output_buffer_offset = 0;
+                        p->current_state = FQ_PARSER_STATE_SEQUENCE;
+                        p->sequence_length = 0;
+                        p->entry_point = FQ_PARSER_ENTRY_LOOP;
+                        return 0;
+                    } else {
                     //     p->output_buffer[p->output_buffer_pos] = p->current_character;
                     //     p->output_buffer_pos ++;
                     //     if(p->output_buffer_pos == p->output_buffer_size){
@@ -102,7 +104,7 @@ entry_start:
                     //         p->entry_point = ENTRY_LOOP;
                     //         return 0;
                     //     }
-                    // }
+                    }
 					break;
                 } // End of processing FQ_PARSER_STATE_HEADER_1 state.
                 case FQ_PARSER_STATE_SEQUENCE:{} // End of processing FQ_PARSER_STATE_SEQUENCE state.
