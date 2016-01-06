@@ -28,7 +28,7 @@ typedef struct {
 // Main file handle functions:
 fqstatus fqfile_open(fqfile *f, const char *filename, fqflag mode, fqflag format);
 void fqfile_close(fqfile *f);
-fqbytecount fqfile_read(void *f, char *buffer, fqbytecount buffer_n);
+fqbytecount fqfile_read(fqfile *f, char *buffer, fqbytecount buffer_n);
 // fqbytecount fqfile_write(fqfile *f, fqbuffer *b);
 char fqfile_eof(fqfile *f);
 

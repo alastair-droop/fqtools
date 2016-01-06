@@ -13,7 +13,7 @@ void fqfile_close(fqfile *f){
     if(f->close != NULL) f->close(f);
 }
 
-fqbytecount fqfile_read(void *f, char *buffer, fqbytecount buffer_n){
+fqbytecount fqfile_read(fqfile *f, char *buffer, fqbytecount buffer_n){
     if(f->read != NULL) return f->read(f, buffer, buffer_n);
     return 0;
 }

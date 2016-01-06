@@ -15,7 +15,7 @@ typedef unsigned char fqstatus;
 typedef unsigned long int fqbytecount;
 
 // #include "fqbuffer.h"
-// #include "fqfile.h"
+#include "fqfile.h"
 // #include "fqfilebuffer.h"
 // #include "fqfileset.h"
 #include "fqparser.h"
