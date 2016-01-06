@@ -73,8 +73,9 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
 void fqparser_free(fqparser *p);
 
 void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags);
-void fqparser_setValidQualityCharacters(fqparser *p);
-void fqparser_show_sequence_characters(fqparser *p);
+void fqparser_setValidQualityCharacters(fqparser *p, fqflag encoding);
+void fqparser_showValidSequenceCharacters(fqparser *p);
+void fqparser_showValidQualityCharacters(fqparser *p);
 
 
 char fqparser_step(fqparser *p);

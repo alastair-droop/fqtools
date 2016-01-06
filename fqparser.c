@@ -117,12 +117,15 @@ void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags){
 	}
 }
 
-void fqparser_setValidQualityCharacters(fqparser *p){
-    //Currently, this is a placeholder, so set them all to be OK:
-    memset(p->valid_quality_characters, 0, 256);
+void fqparser_setValidQualityCharacters(fqparser *p, fqflag encoding){
+    memset(p->valid_quality_characters, 1, 256);
+    if(encoding == FQ_QTYPE_UNKNOWN) memset(p->valid_quality_characters + 33, 0, 94);
+    if(encoding == FQ_QTYPE_SANGER) memset(p->valid_quality_characters + 33, 0, 94);
+    if(encoding == FQ_QTYPE_SOLEXA) memset(p->valid_quality_characters + 59, 0, 68);
+    if(encoding == FQ_QTYPE_ILLUMINA) memset(p->valid_quality_characters + 64, 0, 63);
 }
 
-void fqparser_show_sequence_characters(fqparser *p){
+void fqparser_showValidSequenceCharacters(fqparser *p){
     int i;
     for(i=0;i<250;i++){
         if((i>31) && (i < 127)) printf("%c", i);
@@ -131,6 +134,19 @@ void fqparser_show_sequence_characters(fqparser *p){
     printf("\n");
     for(i=0;i<250;i++){
         printf("%d", p->valid_sequence_characters[i]);
+    }
+    printf("\n");
+}
+
+void fqparser_showValidQualityCharacters(fqparser *p){
+    int i;
+    for(i=0;i<250;i++){
+        if((i>31) && (i < 127)) printf("%c", i);
+        else printf("-");
+    }
+    printf("\n");
+    for(i=0;i<250;i++){
+        printf("%d", p->valid_quality_characters[i]);
     }
     printf("\n");
 }
