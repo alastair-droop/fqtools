@@ -139,7 +139,26 @@ entry_start:
 					}
 					else p->current_state = FQ_PARSER_STATE_SEQUENCE;
                 } // End of processing FQ_PARSER_STATE_SEQUENCE_NEWLINE state.
-                case FQ_PARSER_STATE_HEADER_2:{} // End of processing FQ_PARSER_STATE_HEADER_2 state.
+                case FQ_PARSER_STATE_HEADER_2:{
+					if(p->current_character == '\n'){
+						p->callbacks->header2Block(p->user, p->output_buffer, p->output_buffer_offset, 1);
+						p->output_buffer_offset = 0;
+						p->current_state = FQ_PARSER_STATE_QUALITY;
+						p->quality_length = 0;
+						p->entry_point = FQ_PARSER_ENTRY_LOOP;
+						return 0;
+					} else {
+						p->output_buffer[p->output_buffer_offset] = p->current_character;
+						p->output_buffer_offset ++;
+						if(p->output_buffer_offset == p->output_buffer_max){
+							p->callbacks->header2Block(p->user, p->output_buffer, p->output_buffer_offset, 0);
+							p->output_buffer_offset = 0;
+							p->entry_point = FQ_PARSER_ENTRY_LOOP;
+							return 0;
+						}
+					}
+					break;
+                } // End of processing FQ_PARSER_STATE_HEADER_2 state.
                 case FQ_PARSER_STATE_QUALITY:{} // End of processing FQ_PARSER_STATE_QUALITY state.
             } // End of the state switch
 entry_loop:;
