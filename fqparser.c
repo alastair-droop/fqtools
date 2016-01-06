@@ -23,19 +23,6 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
     return FQ_STATUS_OK;
 }
 
-// fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user){
-//     p->buffer_in = buffer_in;
-//     p->buffer_out = buffer_out;
-//     p->callbacks = callbacks;
-//     p->user = user;
-//     
-//     p->error = 0;
-//     p->index_buffer_in = 0;
-//     p->length_buffer_in = 0;
-//     p->line_number = 0;
-//     return FQ_STATUS_OK;
-// }
-//
 void fqparser_free(fqparser *p){
     free(p->input_buffer);
     free(p->output_buffer);
@@ -57,7 +44,16 @@ entry_start:
         // Get a new chunk if needed:
         if(p->input_buffer_offset == p->input_buffer_size){
             p->input_buffer_size = p->callbacks->readBuffer(p->input_buffer, p->input_buffer_max);
-            if(p->input_buffer_size == 0) return 1; // Checks for EOF.
+            // Check for the end of the file:
+            if(p->input_buffer_size == 0){
+                // Check we're in the correct state to end:
+                if(p->current_state != FQ_PARSER_STATE_INIT){
+                    //There was an error;
+                    p->callbacks->error(p->user, FQ_ERROR_INCOMPLETE_FINAL_READ, p->line_number, p->current_character);
+                    p->error = 1;
+                }
+                return 1;
+            }
             p->input_buffer_offset = 0;
         }
         //Process the chunk of data we have:
