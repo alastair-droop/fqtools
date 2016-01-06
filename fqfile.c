@@ -4,8 +4,8 @@
 fqstatus fqfile_open(fqfile *f, const char *filename, fqflag mode, fqflag format){
     if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_read_file_fastq_uncompressed(f, filename);
     if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_FASTQ_GZ)) return fqfile_open_read_file_fastq_compressed(f, filename);
-    // if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_write_file_fastq_uncompressed(f, filename);
-    // if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ_GZ)) return fqfile_open_write_file_fastq_compressed(f, filename);
+    if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_write_file_fastq_uncompressed(f, filename);
+    if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ_GZ)) return fqfile_open_write_file_fastq_compressed(f, filename);
     return FQ_STATUS_FAIL;
 }
 
@@ -18,10 +18,15 @@ fqbytecount fqfile_read(fqfile *f, char *buffer, fqbytecount buffer_n){
     return 0;
 }
 
-// fqbytecount fqfile_write(fqfile *f, fqbuffer *b){
-//     if(f->write != NULL) return f->write(f, b);
-//     return 0;
-// }
+fqbytecount fqfile_write(fqfile *f, char *buffer, fqbytecount buffer_n){
+    if(f->write != NULL) return f->write(f, buffer, buffer_n);
+    return 0;
+}
+
+fqbytecount fqfile_writechar(fqfile *f, char c){
+    if(f->write != NULL) return f->writechar(f, c);
+    return 0;
+}
 
 char fqfile_eof(fqfile *f){
     if(f->eof != NULL) return f->eof(f);
@@ -47,7 +52,8 @@ fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filenam
     f->mode = FQ_MODE_READ;
     f->format = FQ_FORMAT_FASTQ;
     f->read = fqfile_read_fastq_uncompressed;
-    // f->write = NULL;
+    f->write = NULL;
+    f->writechar = NULL;
     return FQ_STATUS_OK;
 }
 
@@ -68,53 +74,56 @@ fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename)
     f->mode = FQ_MODE_READ;
     f->format = FQ_FORMAT_FASTQ_GZ;
     f->read = fqfile_read_fastq_compressed;
-    // f->write = NULL;
+    f->write = NULL;
+    f->writechar = NULL;
     return FQ_STATUS_OK;
 }
 
-// fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, const char *filename){
-//     if(filename == NULL){
-//         // Writing from a stream, (i.e. stdout):
-//         f->handle = stdout;
-//         f->type = FQ_TYPE_PIPE;
-//         f->eof = fqfile_eof_pipe;
-//         f->close = fqfile_close_pipe;
-//     } else {
-//         // Writing to a named file:
-//         f->handle = (void*)fopen(filename, "w");
-//         if(f->handle == NULL) return FQ_STATUS_FAIL;
-//         f->type = FQ_TYPE_FILE;
-//         f->eof = fqfile_eof_file_fastq_uncompressed;
-//         f->close = fqfile_close_file_fastq_uncompressed;
-//     }
-//     f->mode = FQ_MODE_WRITE;
-//     f->format = FQ_FORMAT_FASTQ;
-//     f->read = NULL;
-//     f->write = fqfile_write_fastq_uncompressed;
-//     return FQ_STATUS_OK;
-// }
-//
-// fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename){
-//     if(filename == NULL){
-//         // Writing from a stream, (i.e. stdout):
-//         f->handle = gzdopen(dup(fileno(stdout)), "w");
-//         f->type = FQ_TYPE_PIPE;
-//         f->eof = fqfile_eof_pipe;
-//         f->close = fqfile_close_file_fastq_compressed;
-//     } else {
-//         // Writing to a named file:
-//         f->handle = (void*)gzopen(filename, "w");
-//         if(f->handle == NULL) return FQ_STATUS_FAIL;
-//         f->type = FQ_TYPE_FILE;
-//         f->eof = fqfile_eof_file_fastq_compressed;
-//         f->close = fqfile_close_file_fastq_compressed;
-//     }
-//     f->mode = FQ_MODE_WRITE;
-//     f->format = FQ_FORMAT_FASTQ_GZ;
-//     f->read = NULL;
-//     f->write = fqfile_write_fastq_compressed;
-//     return FQ_STATUS_OK;
-// }
+fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, const char *filename){
+    if(filename == NULL){
+        // Writing from a stream, (i.e. stdout):
+        f->handle = stdout;
+        f->type = FQ_TYPE_PIPE;
+        f->eof = fqfile_eof_pipe;
+        f->close = fqfile_close_pipe;
+    } else {
+        // Writing to a named file:
+        f->handle = (void*)fopen(filename, "w");
+        if(f->handle == NULL) return FQ_STATUS_FAIL;
+        f->type = FQ_TYPE_FILE;
+        f->eof = fqfile_eof_file_fastq_uncompressed;
+        f->close = fqfile_close_file_fastq_uncompressed;
+    }
+    f->mode = FQ_MODE_WRITE;
+    f->format = FQ_FORMAT_FASTQ;
+    f->read = NULL;
+    f->write = fqfile_write_fastq_uncompressed;
+    f->writechar = fqfile_writechar_fastq_uncompressed;
+    return FQ_STATUS_OK;
+}
+
+fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename){
+    if(filename == NULL){
+        // Writing from a stream, (i.e. stdout):
+        f->handle = gzdopen(dup(fileno(stdout)), "w");
+        f->type = FQ_TYPE_PIPE;
+        f->eof = fqfile_eof_pipe;
+        f->close = fqfile_close_file_fastq_compressed;
+    } else {
+        // Writing to a named file:
+        f->handle = (void*)gzopen(filename, "w");
+        if(f->handle == NULL) return FQ_STATUS_FAIL;
+        f->type = FQ_TYPE_FILE;
+        f->eof = fqfile_eof_file_fastq_compressed;
+        f->close = fqfile_close_file_fastq_compressed;
+    }
+    f->mode = FQ_MODE_WRITE;
+    f->format = FQ_FORMAT_FASTQ_GZ;
+    f->read = NULL;
+    f->write = fqfile_write_fastq_compressed;
+    f->writechar = fqfile_writechar_fastq_compressed;
+    return FQ_STATUS_OK;
+}
 
 // Callbacks for closing files:
 void fqfile_close_file_fastq_uncompressed(fqfile *f){
@@ -142,21 +151,28 @@ fqbytecount fqfile_read_fastq_compressed(fqfile *f, char *buffer, fqbytecount bu
     return (fqbytecount)gzread((gzFile*)(((fqfile*)f)->handle), buffer, (int)buffer_n); // Read into the buffer
 }
 
-// // Callbacks to write buffer data to file:
-// // These functions write from the start of the buffer to the position marked by b.offset.
-// fqbytecount fqfile_write_fastq_uncompressed(void *f, fqbuffer *b){
-//     if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
-//     if(b->offset == 0) return 0; // No point writing anything if there is nothing to write!
-//     int bytes_written = (fqbytecount)fwrite(b->data, sizeof(char), b->offset, (FILE*)(((fqfile*)f)->handle));
-//     return bytes_written;
-// }
-//
-// fqbytecount fqfile_write_fastq_compressed(void *f, fqbuffer *b){
-//     if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
-//     if(b->offset == 0) return 0; // No point writing anything if there is nothing to write!
-//     int bytes_written = (fqbytecount)gzwrite((gzFile*)(((fqfile*)f)->handle), b->data, (unsigned int)b->offset);
-//     return bytes_written;
-// }
+// Callbacks to write buffer data to file:
+// These functions write from the start of the buffer to the position marked by b.offset.
+fqbytecount fqfile_write_fastq_uncompressed(fqfile *f, char *buffer, fqbytecount buffer_n){
+    if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
+    return (fqbytecount)fwrite(buffer, sizeof(char), buffer_n, (FILE*)(f->handle));
+}
+
+fqbytecount fqfile_write_fastq_compressed(fqfile *f, char *buffer, fqbytecount buffer_n){
+    if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
+    return (fqbytecount)gzwrite((gzFile*)(f->handle), buffer, (unsigned int)buffer_n);
+}
+
+fqbytecount fqfile_writechar_fastq_uncompressed(fqfile *f, char c){
+    if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
+    return (fqbytecount)fwrite(&c, sizeof(char), 1, (FILE*)(f->handle));
+}
+
+fqbytecount fqfile_writechar_fastq_compressed(fqfile *f, char c){
+    if(((fqfile*)f)->mode != FQ_MODE_WRITE) return 0; // Check that we're allowed to write to this file
+    return (fqbytecount)gzwrite((gzFile*)(f->handle), &c, 1);
+}
+
 
 // Callbacks to determine end of file:
 char fqfile_eof_file_fastq_uncompressed(fqfile *f){
