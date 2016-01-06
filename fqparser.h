@@ -32,13 +32,13 @@
 //Define the parser callback struct:
 typedef struct {
     char interrupt;
-    // void (*startRead)(void *user);
-    // void (*endRead)(void *user);
-    // void (*header1Block)(void *user, fqbuffer *block, char final);
-    // void (*header2Block)(void *user, fqbuffer *block, char final);
-    // void (*sequenceBlock)(void *user, fqbuffer *block, char final);
-    // void (*qualityBlock)(void *user, fqbuffer *block, char final);
-    // void (*error)(void *user, char error_type, size_t line, char character);
+    void (*startRead)(void *user);
+    void (*endRead)(void *user);
+    void (*header1Block)(void *user, char *block, fqbytecount block_n, char final);
+    void (*header2Block)(void *user, char *block, fqbytecount block_n, char final);
+    void (*sequenceBlock)(void *user, char *block, fqbytecount block_n, char final);
+    void (*qualityBlock)(void *user, char *block, fqbytecount block_n, char final);
+    void (*error)(void *user, char error_type, size_t line, char character);
     fqbytecount (*readBuffer)(char *b, fqbytecount b_size);
 } fqparser_callbacks;
 
@@ -46,11 +46,11 @@ typedef struct {
     //IO:
     char *input_buffer;
     fqbytecount input_buffer_size;
-    fqbytecount input_buffer_max_size;    
+    fqbytecount input_buffer_max;    
     fqbytecount input_buffer_offset;
     char *output_buffer;
     fqbytecount output_buffer_size;
-    fqbytecount output_buffer_max_size;
+    fqbytecount output_buffer_max;
     fqbytecount output_buffer_offset;
     //Callbacks:
     fqparser_callbacks *callbacks;
@@ -62,17 +62,17 @@ typedef struct {
     // fqparser_callbacks *callbacks;
     // // fqfileset *output_fileset;
     // // char *valid_chars;
-    // char entry_point;
-    // char error;
+    char error;
 
     // Temporary state:
     // fqbytecount sequence_length;
     // fqbytecount quality_length;
+    char entry_point;
     char current_character;
-    // char current_state;
+    char current_state;
     // fqbytecount index_buffer_in;
     // fqbytecount length_buffer_in;
-    // size_t line_number;
+    fqbytecount line_number;
 } fqparser;
 
 // fqstatus fqparser_init(fqparser *p, fqbuffer *buffer_in, fqbuffer *buffer_out, fqparser_callbacks *callbacks, void *user);

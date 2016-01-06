@@ -3,19 +3,22 @@
 fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, void *user){
     p->input_buffer = (char*)malloc(in_bufsize * sizeof(char));
     if(p->input_buffer == NULL) return FQ_STATUS_FAIL;
-    p->output_buffer = (char*)malloc(out_bufsize * sizeof(char));
+    p->output_buffer = (char*)malloc((out_bufsize + 1) * sizeof(char));
     if(p->output_buffer == NULL){
         free(p->input_buffer);
         return FQ_STATUS_FAIL;
     }
     p->input_buffer_size = 0;
-    p->input_buffer_max_size = in_bufsize;
+    p->input_buffer_max = in_bufsize;
     p->input_buffer_offset = 0;
     p->output_buffer_size = 0;
-    p->output_buffer_max_size = out_bufsize;
+    p->output_buffer_max = out_bufsize;
     p->output_buffer_offset = 0;
+    p->output_buffer[p->output_buffer_max] = '\0';
     p->user = user;
     p->callbacks = callbacks;
+    p->entry_point = FQ_PARSER_ENTRY_START;
+    p->line_number = 0;
     return FQ_STATUS_OK;
 }
 
@@ -24,7 +27,7 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
 //     p->buffer_out = buffer_out;
 //     p->callbacks = callbacks;
 //     p->user = user;
-//     p->entry_point = FQ_PARSER_ENTRY_START;
+//     
 //     p->error = 0;
 //     p->index_buffer_in = 0;
 //     p->length_buffer_in = 0;
@@ -39,29 +42,79 @@ void fqparser_free(fqparser *p){
 }
 
 char fqparser_step(fqparser *p){
-    // fqbytecount offset;
+    switch(p->entry_point){
+        case FQ_PARSER_ENTRY_START: goto entry_start;
+        case FQ_PARSER_ENTRY_LOOP: goto entry_loop;
+        case FQ_PARSER_ENTRY_DONE: goto entry_done;
+    }
+entry_start:
+    p->current_state = FQ_PARSER_STATE_INIT;
+    p->line_number = 1;
     // Ask for chunks of data, until we're not given any more:
     while(1){
+        // Get a new chunk if needed:
         if(p->input_buffer_offset == p->input_buffer_size){
-            printf("PARSER ASKING CALLBACKS FOR A NEW CHUNK...\n");
-            p->input_buffer_size = p->callbacks->readBuffer(p->input_buffer, p->input_buffer_max_size);
-            printf("PARSER GIVEN %ld BYTES OF DATA...\n", p->input_buffer_size);
-            if(p->input_buffer_size == 0){
-                printf("ENDING...\n");
-                return 1;
-            }
+            p->input_buffer_size = p->callbacks->readBuffer(p->input_buffer, p->input_buffer_max);
+            if(p->input_buffer_size == 0) return 1; // Checks for EOF.
             p->input_buffer_offset = 0;
         }
         //Process the chunk of data we have:
-        while(p->input_buffer_offset <= p->input_buffer_size){
+        while(p->input_buffer_offset < p->input_buffer_size){
+            //Check if we've been asked to stop:
+            if(p->callbacks->interrupt != 0){
+                p->entry_point = FQ_PARSER_ENTRY_DONE;
+                return FQ_PARSER_COMPLETE;
+            }
+            // Get the next character, and advance the input buffer offset:
             p->current_character = p->input_buffer[p->input_buffer_offset];
             p->input_buffer_offset++;
-            printf("%c", p->current_character);            
-        }
-        printf("\n");
-        return 1;
-        // }
+            if(p->current_character == '\n') p->line_number ++; // If this is a line break, increment out line count.
+            // Parse the single character based on the state we're currently in:
+            switch(p->current_state){
+                case FQ_PARSER_STATE_INIT:{
+                    if(p->current_character == '@'){
+                        p->current_state = FQ_PARSER_STATE_HEADER_1;
+                        p->output_buffer_offset = 0;
+                        p->callbacks->startRead(p->user);
+                        p->entry_point = FQ_PARSER_ENTRY_LOOP;
+                        return 0;
+                    }
+                    if(p->current_character == '\n') break;
+                    p->callbacks->error(p->user, FQ_ERROR_MISSING_HEADER, p->line_number, p->current_character);
+                    p->entry_point = FQ_PARSER_ENTRY_DONE;
+                    p->error = 1;
+                    return 1;
+                } // End of processing FQ_PARSER_STATE_INIT state.
+                case FQ_PARSER_STATE_HEADER_1:{
+                    // if (p->current_character == '\n'){
+                    //     p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_pos, 1);
+                    //     p->output_buffer_pos = 0;
+                    //     p->current_state = STATE_SEQUENCE;
+                    //     p->sequence_length = 0;
+                    //     p->entry_point = ENTRY_LOOP;
+                    //     return 0;
+                    // } else {
+                    //     p->output_buffer[p->output_buffer_pos] = p->current_character;
+                    //     p->output_buffer_pos ++;
+                    //     if(p->output_buffer_pos == p->output_buffer_size){
+                    //         p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_pos, 0);
+                    //         p->output_buffer_pos = 0;
+                    //         p->entry_point = ENTRY_LOOP;
+                    //         return 0;
+                    //     }
+                    // }
+					break;
+                } // End of processing FQ_PARSER_STATE_HEADER_1 state.
+                case FQ_PARSER_STATE_SEQUENCE:{} // End of processing FQ_PARSER_STATE_SEQUENCE state.
+                case FQ_PARSER_STATE_SEQUENCE_NEWLINE:{} // End of processing FQ_PARSER_STATE_SEQUENCE_NEWLINE state.
+                case FQ_PARSER_STATE_HEADER_2:{} // End of processing FQ_PARSER_STATE_HEADER_2 state.
+                case FQ_PARSER_STATE_QUALITY:{} // End of processing FQ_PARSER_STATE_QUALITY state.
+            } // End of the state switch
+entry_loop:;
+        } // End of processing the chunk.
     }
+entry_done:
+return 1;
 }
 //
 // char fqparser_step(fqparser *p){

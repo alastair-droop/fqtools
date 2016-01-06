@@ -117,27 +117,27 @@ fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename)
 // }
 
 // Callbacks for closing files:
-void fqfile_close_file_fastq_uncompressed(void *f){
-    if((FILE*)(((fqfile*)f)->handle) != NULL) fclose((FILE*)(((fqfile*)f)->handle));
+void fqfile_close_file_fastq_uncompressed(fqfile *f){
+    if((FILE*)(f->handle) != NULL) fclose((FILE*)(f->handle));
 }
 
-void fqfile_close_file_fastq_compressed(void *f){
-    if((gzFile*)(((fqfile*)f)->handle) != NULL) gzclose((gzFile*)(((fqfile*)f)->handle));
+void fqfile_close_file_fastq_compressed(fqfile *f){
+    if((gzFile*)(f->handle) != NULL) gzclose((gzFile*)(f->handle));
 }
 
-void fqfile_close_pipe(void *f){
+void fqfile_close_pipe(fqfile *f){
     return;
 }
 
 // Callbacks for reading file data into a buffer:
 // These functions read data directly into the beginning of the buffer, reading a maximum of buffer.size
 // bytes. The resulting buffer is always null-terminated so it can be read like a string later on.
-fqbytecount fqfile_read_fastq_uncompressed(void *f, char *buffer, fqbytecount buffer_n){
+fqbytecount fqfile_read_fastq_uncompressed(fqfile *f, char *buffer, fqbytecount buffer_n){
     if(((fqfile*)f)->mode != FQ_MODE_READ) return 0; // Check that we're allowed to read from this file
     return (fqbytecount)fread(buffer, sizeof(char), buffer_n, (FILE*)(((fqfile*)f)->handle)); // Read into the buffer
 }
 
-fqbytecount fqfile_read_fastq_compressed(void *f, char *buffer, fqbytecount buffer_n){
+fqbytecount fqfile_read_fastq_compressed(fqfile *f, char *buffer, fqbytecount buffer_n){
     if(((fqfile*)f)->mode != FQ_MODE_READ) return 0; // Check that we're allowed to read from this file
     return (fqbytecount)gzread((gzFile*)(((fqfile*)f)->handle), buffer, (int)buffer_n); // Read into the buffer
 }
@@ -159,15 +159,15 @@ fqbytecount fqfile_read_fastq_compressed(void *f, char *buffer, fqbytecount buff
 // }
 
 // Callbacks to determine end of file:
-char fqfile_eof_file_fastq_uncompressed(void *f){
+char fqfile_eof_file_fastq_uncompressed(fqfile *f){
     return feof((FILE*)(((fqfile*)f)->handle));
 }
 
-char fqfile_eof_file_fastq_compressed(void *f){
+char fqfile_eof_file_fastq_compressed(fqfile *f){
     return gzeof((gzFile*)(((fqfile*)f)->handle));
 }
 
-char fqfile_eof_pipe(void *f){
+char fqfile_eof_pipe(fqfile *f){
     return fqfile_eof_file_fastq_uncompressed(f);
 }
 
