@@ -52,7 +52,7 @@ entry_start:
                     p->callbacks->error(p->user, FQ_ERROR_INCOMPLETE_FINAL_READ, p->line_number, p->current_character);
                     p->error = 1;
                 }
-                return 1;
+                return FQ_PARSER_COMPLETE;
             }
             p->input_buffer_offset = 0;
         }
@@ -75,13 +75,13 @@ entry_start:
                         p->output_buffer_offset = 0;
                         p->callbacks->startRead(p->user);
                         p->entry_point = FQ_PARSER_ENTRY_LOOP;
-                        return 0;
+                        return FQ_PARSER_INCOMPLETE;
                     }
                     if(p->current_character == '\n') break;
                     p->callbacks->error(p->user, FQ_ERROR_MISSING_HEADER, p->line_number, p->current_character);
                     p->entry_point = FQ_PARSER_ENTRY_DONE;
                     p->error = 1;
-                    return 1;
+                    return FQ_PARSER_COMPLETE;
                 } // End of processing FQ_PARSER_STATE_INIT state.
                 case FQ_PARSER_STATE_HEADER_1:{
                     if (p->current_character == '\n'){
@@ -90,7 +90,7 @@ entry_start:
                         p->current_state = FQ_PARSER_STATE_SEQUENCE;
                         p->sequence_length = 0;
                         p->entry_point = FQ_PARSER_ENTRY_LOOP;
-                        return 0;
+                        return FQ_PARSER_INCOMPLETE;
                     } else {
                         p->output_buffer[p->output_buffer_offset] = p->current_character;
                         p->output_buffer_offset ++;
@@ -98,7 +98,7 @@ entry_start:
                             p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_offset, 0);
                             p->output_buffer_offset = 0;
                             p->entry_point = FQ_PARSER_ENTRY_LOOP;
-                            return 0;
+                            return FQ_PARSER_INCOMPLETE;
                         }
                     }
 					break;
@@ -112,7 +112,7 @@ entry_start:
                     //         p->callbacks->error(p->user, FQ_ERROR_INVALID_SEQUENCE_CHARACTER, p->line_number, p->current_character);
                     //         p->entry_point = ENTRY_DONE;
                     //         p->error = 1;
-                    //         return 1;
+                    //         return FQ_PARSER_COMPLETE;
                     //     }
                         p->output_buffer[p->output_buffer_offset] = p->current_character;
                         p->output_buffer_offset ++;
@@ -121,7 +121,7 @@ entry_start:
                             p->callbacks->sequenceBlock(p->user, p->output_buffer, p->output_buffer_offset, 0);
                             p->output_buffer_offset = 0;
                             p->entry_point = FQ_PARSER_ENTRY_LOOP;
-                            return 0;
+                            return FQ_PARSER_INCOMPLETE;
                         }
                     }
                     break;
@@ -132,7 +132,7 @@ entry_start:
 						p->output_buffer_offset = 0;
 						p->current_state = FQ_PARSER_STATE_HEADER_2;
 						p->entry_point = FQ_PARSER_ENTRY_LOOP;
-						return 0;
+						return FQ_PARSER_INCOMPLETE;
 					}
 					else p->current_state = FQ_PARSER_STATE_SEQUENCE;
                 } // End of processing FQ_PARSER_STATE_SEQUENCE_NEWLINE state.
@@ -143,7 +143,7 @@ entry_start:
 						p->current_state = FQ_PARSER_STATE_QUALITY;
 						p->quality_length = 0;
 						p->entry_point = FQ_PARSER_ENTRY_LOOP;
-						return 0;
+						return FQ_PARSER_INCOMPLETE;
 					} else {
 						p->output_buffer[p->output_buffer_offset] = p->current_character;
 						p->output_buffer_offset ++;
@@ -151,7 +151,7 @@ entry_start:
 							p->callbacks->header2Block(p->user, p->output_buffer, p->output_buffer_offset, 0);
 							p->output_buffer_offset = 0;
 							p->entry_point = FQ_PARSER_ENTRY_LOOP;
-							return 0;
+							return FQ_PARSER_INCOMPLETE;
 						}
 					}
 					break;
@@ -165,34 +165,34 @@ entry_start:
                         //     p->callbacks->error(p->user, FQ_ERROR_INVALID_QUALITY_CHARACTER, p->line_number, p->current_character);
                         //     p->entry_point = ENTRY_DONE;
                         //     p->error = 1;
-                        //     return 1;
+                        //     return FQ_PARSER_COMPLETE;
                         // }
 						p->quality_length ++;
 						if(p->output_buffer_offset == p->output_buffer_max){
 							p->callbacks->qualityBlock(p->user, p->output_buffer, p->output_buffer_offset, 0);
 							p->output_buffer_offset = 0;
 							p->entry_point = FQ_PARSER_ENTRY_LOOP;
-							return 0;
+							return FQ_PARSER_INCOMPLETE;
 						}
 					}
 					if(p->quality_length == p->sequence_length){
 						p->callbacks->qualityBlock(p->user, p->output_buffer, p->output_buffer_offset, 1);
 						p->entry_point = FQ_PARSER_ENTRY_QUALITY;
-						return 0;
+						return FQ_PARSER_INCOMPLETE;
 entry_quality:
 						p->output_buffer_offset = 0;
 						p->current_state = FQ_PARSER_STATE_INIT;
 						p->callbacks->endRead(p->user);
 						p->entry_point = FQ_PARSER_ENTRY_LOOP;
-						return 0;
+						return FQ_PARSER_INCOMPLETE;
 					}
                 } // End of processing FQ_PARSER_STATE_QUALITY state.
             } // End of the state switch
 entry_loop:;
         } // End of processing the chunk.
     }
-entry_done:
-return 1;
+    entry_done:
+    return FQ_PARSER_COMPLETE;
 }
 //
 // char fqparser_step(fqparser *p){
@@ -271,7 +271,7 @@ return 1;
 //                         //     p->callbacks->error(p->user, FQ_ERROR_INVALID_SEQUENCE_CHARACTER, p->line_number, p->current_character);
 //                         //     p->entry_point = FQ_PARSER_ENTRY_DONE;
 //                         //     p->error = 1;
-//                         //     return 1;
+//                         //     return FQ_PARSER_COMPLETE;
 //                         // }
 //                         fqbuffer_appendchar(p->buffer_out, p->current_character);
 //                         p->sequence_length ++ ;
@@ -300,7 +300,7 @@ return 1;
 //                         //     p->callbacks->error(p->user, FQ_ERROR_INVALID_QUALITY_CHARACTER, p->line_number, p->current_character);
 //                         //     p->entry_point = ENTRY_DONE;
 //                         //     p->error = 1;
-//                         //     return 1;
+//                         //     return FQ_PARSER_COMPLETE;
 //                         // }
 //                     }
 //                     if(p->quality_length == p->sequence_length){
