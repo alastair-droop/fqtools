@@ -55,8 +55,8 @@ int main(int argc, const char *argv[]){
     options.quality = FQ_QTYPE_UNKNOWN;
     options.input_format = FQ_FORMAT_UNKNOWN;
     options.output_format = FQ_FORMAT_UNKNOWN;
-    options.input_interleaving = FQ_FILESET_NONINTERLEAVED;
-    options.output_interleaving = FQ_FILESET_NONINTERLEAVED;
+    options.input_interleaving = FQ_NONINTERLEAVED;
+    options.output_interleaving = FQ_NONINTERLEAVED;
     options.file_pair_replacement = '%';
     
     //Parse the global options:
@@ -76,8 +76,8 @@ int main(int argc, const char *argv[]){
             case 'f':{options.input_format = format_type(*optarg); break;}
             case 'F':{options.output_format = format_type(*optarg); break;}
             case 'q':{options.quality = quality_type(*optarg); break;}
-            case 'i':{options.input_interleaving = FQ_FILESET_INTERLEAVED; break;}
-            case 'I':{options.output_interleaving = FQ_FILESET_INTERLEAVED; break;}
+            case 'i':{options.input_interleaving = FQ_INTERLEAVED; break;}
+            case 'I':{options.output_interleaving = FQ_INTERLEAVED; break;}
             default:{global_usage(); exit(FQ_STATUS_FAIL);}
         }
     }
