@@ -24,6 +24,7 @@ struct fqfile {
     fqbytecount (*write)(fqfile *f, char *buffer, fqbytecount buffer_n);
     fqbytecount (*writechar)(fqfile *f, char c);
     char (*eof)(fqfile *f);
+    void (*flush)(fqfile *f);
 };
 
 // Main file handle functions:
@@ -33,6 +34,7 @@ fqbytecount fqfile_read(fqfile *f, char *buffer, fqbytecount buffer_n);
 fqbytecount fqfile_write(fqfile *f, char *buffer, fqbytecount buffer_n);
 fqbytecount fqfile_writechar(fqfile *f, char c);
 char fqfile_eof(fqfile *f);
+void fqfile_flush(fqfile *f);
 
 // Callbacks to open different file types:
 fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filename);
@@ -57,6 +59,11 @@ fqbytecount fqfile_writechar_fastq_compressed(fqfile *f, char c);
 char fqfile_eof_file_fastq_uncompressed(fqfile *f);
 char fqfile_eof_file_fastq_compressed(fqfile *f);
 char fqfile_eof_pipe(fqfile *f);
+
+// Callbacks to flush a file:
+void fqfile_flush_file_fastq_uncompressed(fqfile *f);
+void fqfile_flush_file_fastq_compressed(fqfile *f);
+void fqfile_flush_pipe(fqfile *f);
 
 // Functions to guess the file type by name or magic number:
 fqflag guess_filename_format(const char *filename);

@@ -166,7 +166,7 @@ entry_start:
     while(1){
         // Get a new chunk if needed:
         if(p->input_buffer_offset == p->input_buffer_size){
-            p->input_buffer_size = p->callbacks->readBuffer(p->input_buffer, p->input_buffer_max);
+            p->input_buffer_size = p->callbacks->readBuffer(p->user, p->input_buffer, p->input_buffer_max);
             // Check for the end of the file:
             if(p->input_buffer_size == 0){
                 // Check we're in the correct state to end:

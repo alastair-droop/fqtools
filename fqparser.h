@@ -39,7 +39,7 @@ typedef struct {
     void (*sequenceBlock)(void *user, char *block, fqbytecount block_n, char final);
     void (*qualityBlock)(void *user, char *block, fqbytecount block_n, char final);
     void (*error)(void *user, char error_type, size_t line, char character);
-    fqbytecount (*readBuffer)(char *b, fqbytecount b_size);
+    fqbytecount (*readBuffer)(void *user, char *b, fqbytecount b_size);
 } fqparser_callbacks;
 
 typedef struct {

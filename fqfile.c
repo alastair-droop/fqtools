@@ -33,6 +33,10 @@ char fqfile_eof(fqfile *f){
     return 1;
 }
 
+void fqfile_flush(fqfile *f){
+    if(f->flush != NULL) f->flush(f);
+}
+
 // Callbacks for opening files:
 fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filename){
     if(filename == NULL){
@@ -40,6 +44,7 @@ fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filenam
         f->handle = stdin;
         f->type = FQ_TYPE_PIPE;
         f->eof = fqfile_eof_pipe;
+        f->flush = fqfile_flush_pipe;
         f->close = fqfile_close_pipe;
     } else {
         // Reading from a named file:
@@ -47,6 +52,7 @@ fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filenam
         if(f->handle == NULL) return FQ_STATUS_FAIL;
         f->type = FQ_TYPE_FILE;
         f->eof = fqfile_eof_file_fastq_uncompressed;
+        f->flush = fqfile_flush_file_fastq_uncompressed;
         f->close = fqfile_close_file_fastq_uncompressed;
     }
     f->mode = FQ_MODE_READ;
@@ -63,12 +69,14 @@ fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename)
         f->handle = gzdopen(dup(fileno(stdin)), "r");
         f->type = FQ_TYPE_PIPE;
         f->eof = fqfile_eof_pipe;
+        f->flush = fqfile_flush_pipe;
         f->close = fqfile_close_file_fastq_compressed;
     } else {
         f->handle = (void*)gzopen(filename, "r");
         if(f->handle == NULL) return FQ_STATUS_FAIL;
         f->type = FQ_TYPE_FILE;
         f->eof = fqfile_eof_file_fastq_compressed;
+        f->flush = fqfile_flush_file_fastq_compressed;
         f->close = fqfile_close_file_fastq_compressed;
     }
     f->mode = FQ_MODE_READ;
@@ -186,6 +194,21 @@ char fqfile_eof_file_fastq_compressed(fqfile *f){
 char fqfile_eof_pipe(fqfile *f){
     return fqfile_eof_file_fastq_uncompressed(f);
 }
+
+//Callbacks to flush the file:
+void fqfile_flush_file_fastq_uncompressed(fqfile *f){
+    fflush((FILE*)(((fqfile*)f)->handle));
+}
+
+void fqfile_flush_file_fastq_compressed(fqfile *f){
+    gzflush((gzFile*)(((fqfile*)f)->handle), 0);
+    
+}
+
+void fqfile_flush_pipe(fqfile *f){
+    fflush((FILE*)(((fqfile*)f)->handle));
+}
+
 
 // Guess the file format by its name:
 fqflag guess_filename_format(const char *filename){

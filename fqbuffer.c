@@ -21,7 +21,7 @@ void fqbuffer_free(fqbuffer *b){
 // Reset an fqbuffer object by clearing its contents and
 // setting the offset to the start:
 void fqbuffer_reset(fqbuffer *b){
-    memset(b->data, 0, (size_t)(b->size));
+    // memset(b->data, 0, (size_t)(b->size));
     b->offset = 0;
 }
 
