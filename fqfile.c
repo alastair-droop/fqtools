@@ -1,7 +1,8 @@
 #include "fqheader.h"
 
 // The general file manipulations. These delegate to specific callbacks:
-fqstatus fqfile_open(fqfile *f, const char *filename, fqflag mode, fqflag format){
+fqstatus fqfile_open(fqfile *f, char *filename, fqflag mode, fqflag format){
+    if(format == FQ_FORMAT_UNKNOWN) format = guess_file_format(filename);
     if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_read_file_fastq_uncompressed(f, filename);
     if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_FASTQ_GZ)) return fqfile_open_read_file_fastq_compressed(f, filename);
     if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_write_file_fastq_uncompressed(f, filename);
@@ -38,7 +39,7 @@ void fqfile_flush(fqfile *f){
 }
 
 // Callbacks for opening files:
-fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filename){
+fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, char *filename){
     if(filename == NULL){
         // Reading from a stream, (i.e. stdin):
         f->handle = stdin;
@@ -63,7 +64,7 @@ fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filenam
     return FQ_STATUS_OK;
 }
 
-fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename){
+fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, char *filename){
     if(filename == NULL){
         // Reading from a stream, (i.e. stdin):
         f->handle = gzdopen(dup(fileno(stdin)), "r");
@@ -87,7 +88,7 @@ fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename)
     return FQ_STATUS_OK;
 }
 
-fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, const char *filename){
+fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, char *filename){
     if(filename == NULL){
         // Writing from a stream, (i.e. stdout):
         f->handle = stdout;
@@ -110,7 +111,7 @@ fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, const char *filena
     return FQ_STATUS_OK;
 }
 
-fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename){
+fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, char *filename){
     if(filename == NULL){
         // Writing from a stream, (i.e. stdout):
         f->handle = gzdopen(dup(fileno(stdout)), "w");
@@ -209,9 +210,55 @@ void fqfile_flush_pipe(fqfile *f){
     fflush((FILE*)(((fqfile*)f)->handle));
 }
 
+// Generate a filename from a file stem:
+char* generate_filename(char *stem, char rep_chr, char pair, fqflag format){
+    if(stem == NULL) return NULL;
+    char *replacement, *extension, *output;
+    size_t i, output_length;
+    //Get the replacement string:
+    switch(pair){
+        case 1: {replacement = "1"; break;}
+        case 2: {replacement = "2"; break;}
+        case 0: default: {replacement = ""; break;}
+    }
+    //Get the extension string:
+    switch(format){
+        case FQ_FORMAT_FASTQ: {extension = ".fastq"; break;}
+        case FQ_FORMAT_FASTQ_GZ: {extension = ".fastq.gz"; break;}
+        case FQ_FORMAT_BAM: {extension = ".bam"; break;}
+        case FQ_FORMAT_UNKNOWN: default: {extension = "";}
+    }
+    //Iterate through the original string counting the times we see the replacement string:
+    output_length = strlen(stem) + 1;
+    for(i=0; i < strlen(stem); i++) if(stem[i] == rep_chr) output_length += strlen(replacement) - 1;
+    output_length += strlen(extension);
+    // Malloc the output string:
+    output = (char*)malloc(output_length * sizeof(char));
+    if(output == NULL){
+        fprintf(stderr, "ERROR: failed to allocate filename\n");
+        return NULL;
+    }
+    memset(output, 0, output_length);
+    //Copy the stem into the output:
+    char *ptr_stem = stem;
+    char *ptr_output = output;
+    for(i=0; i < strlen(stem); i++){
+        if(ptr_stem[0] == rep_chr){
+            memcpy(ptr_output, replacement, strlen(replacement));
+            ptr_stem++;
+            ptr_output += strlen(replacement);
+        } else {
+            memcpy(ptr_output, ptr_stem, 1);
+            ptr_stem++;
+            ptr_output++;
+        }
+    }
+    memcpy(ptr_output, extension, strlen(extension));
+    return(output);
+}
 
 // Guess the file format by its name:
-fqflag guess_filename_format(const char *filename){
+fqflag guess_filename_format(char *filename){
     if(filename == NULL) return guess_stdin_format();
     if(strlen(filename) < 3) return guess_file_format(filename);
     if(strncmp(filename + (strlen(filename) - 3), ".gz", 3) == 0) return FQ_FORMAT_FASTQ_GZ;
@@ -219,7 +266,7 @@ fqflag guess_filename_format(const char *filename){
 }
 
 // Guess the file format by peeking into the file, and looking at the magic number:
-fqflag guess_file_format(const char *filename){
+fqflag guess_file_format(char *filename){
     FILE *f;
     unsigned char c1 = 0;
     unsigned char c2 = 0;

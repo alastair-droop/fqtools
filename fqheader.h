@@ -43,7 +43,10 @@ typedef struct {
     fqflag quality;
     fqflag input_format;
     fqflag output_format;
-    fqflag interleaving;
+    fqflag input_interleaving;
+    fqflag output_interleaving;
+    char file_pair_replacement;
+    char *file_output_stem;
 } fqglobal;
 
 // Define the subcommand processor functions:

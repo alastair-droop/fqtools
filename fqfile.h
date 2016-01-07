@@ -28,7 +28,7 @@ struct fqfile {
 };
 
 // Main file handle functions:
-fqstatus fqfile_open(fqfile *f, const char *filename, fqflag mode, fqflag format);
+fqstatus fqfile_open(fqfile *f, char *filename, fqflag mode, fqflag format);
 void fqfile_close(fqfile *f);
 fqbytecount fqfile_read(fqfile *f, char *buffer, fqbytecount buffer_n);
 fqbytecount fqfile_write(fqfile *f, char *buffer, fqbytecount buffer_n);
@@ -37,10 +37,10 @@ char fqfile_eof(fqfile *f);
 void fqfile_flush(fqfile *f);
 
 // Callbacks to open different file types:
-fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, const char *filename);
-fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, const char *filename);
-fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, const char *filename);
-fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, const char *filename);
+fqstatus fqfile_open_read_file_fastq_uncompressed(fqfile *f, char *filename);
+fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, char *filename);
+fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, char *filename);
+fqstatus fqfile_open_write_file_fastq_compressed(fqfile *f, char *filename);
 
 // Callbacks to close different file types:
 void fqfile_close_file_fastq_uncompressed(fqfile *f);
@@ -65,7 +65,10 @@ void fqfile_flush_file_fastq_uncompressed(fqfile *f);
 void fqfile_flush_file_fastq_compressed(fqfile *f);
 void fqfile_flush_pipe(fqfile *f);
 
+// Generate a filename from a file stem:
+char* generate_filename(char *stem, char rep_chr, char pair, fqflag format);
+
 // Functions to guess the file type by name or magic number:
-fqflag guess_filename_format(const char *filename);
-fqflag guess_file_format(const char *filename);
+fqflag guess_filename_format(char *filename);
+fqflag guess_file_format(char *filename);
 fqflag guess_stdin_format();

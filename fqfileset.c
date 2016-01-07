@@ -1,6 +1,31 @@
 #include "fqheader.h"
 
-fqstatus fqoutset_open_single(fqoutset *fs, const char *filename, fqflag format, fqflag interleaved){
+fqstatus fqoutset_prepare(fqoutset *f, fqflag paired, char specify_name, fqglobal opt){
+    char *filename_1 = NULL;
+    char *filename_2 = NULL;
+    fqflag result;
+    if((paired == FQ_FILESET_UNPAIRED) && (specify_name == 0)){
+        result = fqoutset_open_single(f, NULL, opt.output_format, opt.output_interleaving);
+        return result;
+    }
+    if(paired == FQ_FILESET_UNPAIRED){
+        filename_1 = generate_filename(opt.file_output_stem, opt.file_pair_replacement, 0, opt.output_format);
+        if(filename_1 == NULL) return FQ_STATUS_FAIL;
+        result = fqoutset_open_single(f, filename_1, opt.output_format, opt.output_interleaving);
+        free(filename_1);
+        return FQ_STATUS_OK;
+    }
+    filename_1 = generate_filename(opt.file_output_stem, opt.file_pair_replacement, 1, opt.output_format);
+    if(filename_1 == NULL) return FQ_STATUS_FAIL;
+    filename_2 = generate_filename(opt.file_output_stem, opt.file_pair_replacement, 2, opt.output_format);
+    if(filename_1 == NULL) {free(filename_1); return FQ_STATUS_FAIL;}
+    result = fqoutset_open_paired(f, filename_1, filename_2, opt.output_format);
+    free(filename_1);
+    free(filename_2);    
+    return result;
+}
+
+fqstatus fqoutset_open_single(fqoutset *fs, char *filename, fqflag format, fqflag interleaved){
     fqstatus result;
     // Open the input file:
     result = fqfile_open(&(fs->file_1), filename, FQ_MODE_WRITE, format);
@@ -11,7 +36,7 @@ fqstatus fqoutset_open_single(fqoutset *fs, const char *filename, fqflag format,
     return FQ_STATUS_OK;
 }
 
-fqstatus fqoutset_open_paired(fqoutset *fs, const char *filename_1, const char *filename_2, fqflag format){
+fqstatus fqoutset_open_paired(fqoutset *fs, char *filename_1, char *filename_2, fqflag format){
     fqstatus result;
     // Open the first input file:
     result = fqfile_open(&(fs->file_1), filename_1, FQ_MODE_WRITE, format);
@@ -55,8 +80,13 @@ void fqoutset_close(fqoutset *fs){
     if(fs->paired == FQ_FILESET_PAIRED) fqfile_close(&(fs->file_2));
 }
 
+fqstatus fqinset_prepare(fqinset *f, fqflag paired, const char *names[], char names_n, fqparser_callbacks *callbacks, fqglobal opt){
+    if((paired == FQ_FILESET_UNPAIRED) && (names_n == 0)) return fqinset_open_single(f, NULL, opt.input_format, opt.input_interleaving, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
+    if(paired == FQ_FILESET_UNPAIRED) return fqinset_open_single(f, (char*)names[names_n - 1], opt.input_format, opt.input_interleaving, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
+    return fqinset_open_paired(f, (char*)names[names_n - 2], (char*)names[names_n - 1], opt.input_format, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
+}
 
-fqstatus fqinset_open_single(fqinset *fs, const char *filename, fqflag format, fqflag interleaved, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
+fqstatus fqinset_open_single(fqinset *fs, char *filename, fqflag format, fqflag interleaved, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
     fqstatus result;
     // Open the input file:
     result = fqfile_open(&(fs->file_1), filename, FQ_MODE_READ, format);
@@ -73,7 +103,7 @@ fqstatus fqinset_open_single(fqinset *fs, const char *filename, fqflag format, f
     return FQ_STATUS_OK;
 }
 
-fqstatus fqinset_open_paired(fqinset *fs, const char *filename_1, const char *filename_2, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
+fqstatus fqinset_open_paired(fqinset *fs, char *filename_1, char *filename_2, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
     fqstatus result;
     // Open the first input file:
     result = fqfile_open(&(fs->file_1), filename_1, FQ_MODE_READ, format);

@@ -53,12 +53,14 @@ int main(int argc, const char *argv[]){
     options.output_bufsize = 1048576;
     options.sequence_flags = 0;
     options.quality = FQ_QTYPE_UNKNOWN;
-    options.input_format = FQ_FORMAT_FASTQ_GZ;
-    options.output_format = FQ_FORMAT_FASTQ_GZ;
-    options.interleaving = FQ_FILESET_NONINTERLEAVED;
+    options.input_format = FQ_FORMAT_UNKNOWN;
+    options.output_format = FQ_FORMAT_UNKNOWN;
+    options.input_interleaving = FQ_FILESET_NONINTERLEAVED;
+    options.output_interleaving = FQ_FILESET_NONINTERLEAVED;
+    options.file_pair_replacement = '%';
     
     //Parse the global options:
-    while((option = getopt(argc, (char* const*)argv, "+hvdramulb:B:q:F:f:i")) != -1){
+    while((option = getopt(argc, (char* const*)argv, "+hvdramulp:b:B:q:F:f:iI")) != -1){
         switch(option){
             case 'h':{global_help(); return FQ_STATUS_OK;}
             case 'v':{global_version(); return FQ_STATUS_OK;}
@@ -68,12 +70,14 @@ int main(int argc, const char *argv[]){
             case 'm':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_MASK; break;}
             case 'u':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_UPPERCASE; break;}
             case 'l':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_LOWERCASE; break;}
+            case 'p':{options.file_pair_replacement = optarg[0]; break;}
             case 'b':{options.input_bufsize = buffer_size(optarg, 1073741824L); break;}
             case 'B':{options.output_bufsize = buffer_size(optarg, 1073741824L); break;}
             case 'f':{options.input_format = format_type(*optarg); break;}
             case 'F':{options.output_format = format_type(*optarg); break;}
             case 'q':{options.quality = quality_type(*optarg); break;}
-            case 'i':{options.interleaving = FQ_FILESET_INTERLEAVED; break;}
+            case 'i':{options.input_interleaving = FQ_FILESET_INTERLEAVED; break;}
+            case 'I':{options.output_interleaving = FQ_FILESET_INTERLEAVED; break;}
             default:{global_usage(); exit(FQ_STATUS_FAIL);}
         }
     }
@@ -90,7 +94,7 @@ int main(int argc, const char *argv[]){
     command = (char*)argv[optind];
     
     //Farm out the individual commands to their processor functions:
-    // if(strcmp(command, "view") == 0) return fqcommand_view(argc, argv, options);
+    if(strcmp(command, "view") == 0) return fqprocess_view(argc, argv, options);
     //OTHER COMMANDS TO FOLLOW!
     
     //If we get to here, the given command string was invalid:

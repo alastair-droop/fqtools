@@ -21,12 +21,17 @@ void global_help(){
     printf("  -m               Allow mask sequence base       (X)\n");
     printf("  -u               Allow uppercase sequence bases\n");
     printf("  -l               Allow lowercase sequence bases\n");
+    printf("  -p CHR           Set the pair replacement character\n");    
     printf("  -b BUFSIZE       Set the input buffer size\n");
     printf("  -B BUFSIZE       Set the output buffer size\n");
     printf("  -q QUALTYPE      Set the quality score encoding\n");
     printf("  -f FORMAT        Set the input file format\n");
     printf("  -F FORMAT        Set the output file format\n");
-    printf("  -i               Treat single files as interleaved\n");
+    printf("  -i               Read interleaved input file pairs\n");
+    printf("  -I               Write interleaved output file pairs\n");
+    printf("\n");
+    printf("CHR:\n");
+    printf("    This character will be replaced by the pair value when writing paired files.\n");
     printf("\n");
     printf("BUFSIZE:\n");
     printf("    Possible suffixes are [bkMG]. If no suffix is given, value is in bytes.\n");
@@ -48,3 +53,10 @@ void global_help(){
 }
 
 // Subcommand messages:
+void fqprocess_view_usage(){
+    printf("VIEW subcommand usage here!\n");    
+}
+
+void fqprocess_view_help(){
+    printf("VIEW subcommand help here!\n");
+}

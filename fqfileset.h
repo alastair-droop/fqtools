@@ -17,8 +17,10 @@ typedef struct {
     fqfile file_2;
 } fqoutset;
 
-fqstatus fqoutset_open_single(fqoutset *fs, const char *filename, fqflag format, fqflag interleaved);
-fqstatus fqoutset_open_paired(fqoutset *fs, const char *filename_1, const char *filename_2, fqflag format);
+fqstatus fqoutset_prepare(fqoutset *f, fqflag paired, char specify_name, fqglobal opt);
+
+fqstatus fqoutset_open_single(fqoutset *fs, char *filename, fqflag format, fqflag interleaved);
+fqstatus fqoutset_open_paired(fqoutset *fs, char *filename_1, char *filename_2, fqflag format);
 
 fqbytecount fqoutset_write(fqoutset *fs, char file, char *buffer, fqbytecount buffer_n);
 fqbytecount fqoutset_writechar(fqoutset *fs, char file, char c);
@@ -36,8 +38,9 @@ typedef struct {
     fqparser parser_2;
 } fqinset;
 
-fqstatus fqinset_open_single(fqinset *fs, const char *filename, fqflag format, fqflag interleaved, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding);
-fqstatus fqinset_open_paired(fqinset *fs, const char *filename_1, const char *filename_2, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding);
+fqstatus fqinset_prepare(fqinset *f, fqflag paired, const char *names[], char names_n, fqparser_callbacks *callbacks, fqglobal opt);
+fqstatus fqinset_open_single(fqinset *fs, char *filename, fqflag format, fqflag interleaved, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding);
+fqstatus fqinset_open_paired(fqinset *fs, char *filename_1, char *filename_2, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding);
 
 fqbytecount fqinset_read(fqinset *fs, char file, char *buffer, fqbytecount buffer_n);
 
@@ -61,8 +64,8 @@ void fqinset_close(fqinset *fs);
 //     fqparser parser_2;
 // } fqfileset;
 //
-// fqstatus fqfileset_open_single_write(fqfileset *fs, const char *filename, fqflag format, fqflag interleaved);
-// fqstatus fqfileset_open_pair_write(fqfileset *fs, const char *filename_1, const char *filename_2, fqflag format);
+// fqstatus fqfileset_open_single_write(fqfileset *fs, char *filename, fqflag format, fqflag interleaved);
+// fqstatus fqfileset_open_pair_write(fqfileset *fs, char *filename_1, char *filename_2, fqflag format);
 //
 // fqbytecount fqfileset_read(fqfileset *fs, char file, char *buffer, fqbytecount buffer_n);
 //

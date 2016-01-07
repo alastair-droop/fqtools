@@ -13,7 +13,7 @@ fqstatus fqbuffer_init(fqbuffer *b, fqbytecount size){
 
 // Free an fqbuffer object:
 void fqbuffer_free(fqbuffer *b){
-    free(b->data);
+    if(b->data != NULL) free(b->data);
     b->size = 0;
     b->offset = 0;
 }

@@ -3,4 +3,4 @@ fqtools
 test-fqbuffer
 fqtest
 scratch.c
-out_*.fastq
+*.fastq*

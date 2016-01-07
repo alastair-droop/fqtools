@@ -48,12 +48,12 @@ void fqparser_free(fqparser *p){
 
 void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags){
     memset(p->valid_sequence_characters, 1, 256);
-	char dna = (flags & (1 << 6)) != 0;
-	char rna = (flags & (1 << 5)) != 0;
-	char ambiguous = (flags & (1 << 4)) != 0;
-	char mask = (flags & (1 << 3)) != 0;
-	char lowercase = (flags & (1 << 2)) != 0;
-	char uppercase = (flags & (1 << 1)) != 0;
+	char dna = (flags & SEQ_DNA) != 0;
+	char rna = (flags & SEQ_DNA) != 0;
+	char ambiguous = (flags & SEQ_AMBIGUOUS) != 0;
+	char mask = (flags & SEQ_MASK) != 0;
+	char lowercase = (flags & SEQ_LOWERCASE) != 0;
+	char uppercase = (flags & SEQ_UPPERCASE) != 0;
 	if (dna == 1){
 		if (uppercase == 1){
 			p->valid_sequence_characters['A'] = 0;

@@ -9,7 +9,7 @@ TEST_BIN=./tests
 
 SUBPROCESSES=view
 SUBPROCESS_FILES=$(addsuffix .c, $(addprefix fqprocess_, $(SUBPROCESSES)))
-MODULES=fqbuffer.c fqfile.c fqfileset.c fqparser.c fqgenerics.c fqhelp.c $(SUBPROCESS_FILES)
+MODULES=fqbuffer.c fqfile.c fqfileset.c fqparser.c fqgenerics.c fqhelp.c
 MODULE_LIST=$(addprefix $(SRC)/, $(MODULES))
 
 EXEC=fqtools
@@ -17,7 +17,7 @@ EXEC=fqtools
 .PHONY: all tests clean fqtools
 
 fqtools:
-	$(CC) $(CFLAGS) -o$(BIN)/$(EXEC) -lz $(MODULE_LIST) $(SRC)/fqtools.c
+	$(CC) $(CFLAGS) -o$(BIN)/$(EXEC) -lz $(MODULE_LIST) $(SUBPROCESS_FILES) $(SRC)/fqtools.c
 
 tests:
 	$(CC) $(CFLAGS) -o $(TEST_BIN)/test-fqbuffer -I$(SRC) -I$(TEST_SRC) $(MODULE_LIST) -lz $(TEST_SRC)/test-fqbuffer.c
