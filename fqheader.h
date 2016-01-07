@@ -32,6 +32,16 @@ typedef unsigned char fqstatus;
 #define FQ_QTYPE_SOLEXA 59
 #define FQ_QTYPE_ILLUMINA 64
 
+// Define the file set types:
+#define FQ_UNPAIRED 0
+#define FQ_PAIRED 1
+
+#define FQ_PAIR_1 0
+#define FQ_PAIR_2 1
+
+#define FQ_NONINTERLEAVED 0
+#define FQ_INTERLEAVED 1
+
 // Define a type for a number of bytes read:
 typedef unsigned long int fqbytecount;
 
@@ -56,7 +66,8 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options);
 #include "fqbuffer.h"
 #include "fqfile.h"
 #include "fqparser.h"
-#include "fqfileset.h"
+#include "fqfsin.h"
+#include "fqfsout.h"
 #include "fqgenerics.h"
 #include "fqhelp.h"
 
