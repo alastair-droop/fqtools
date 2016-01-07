@@ -45,86 +45,56 @@ fqflag quality_type(char q){
 int main(int argc, const char *argv[]){
     int option;
     char sequence_specified = 0;
-    fqbytecount input_bufsize = 1048576;
-    fqbytecount output_bufsize = 1048576;
-    fqflag sequence_flags = 0;
-    fqflag quality = FQ_QTYPE_UNKNOWN;
-    fqflag input_format = FQ_FORMAT_FASTQ_GZ;
-    fqflag output_format = FQ_FORMAT_FASTQ_GZ;
-    fqflag interleaving = FQ_FILESET_NONINTERLEAVED;
+    fqglobal options;
+    char *command;
+
+    //Set the default global options:
+    options.input_bufsize = 1048576;
+    options.output_bufsize = 1048576;
+    options.sequence_flags = 0;
+    options.quality = FQ_QTYPE_UNKNOWN;
+    options.input_format = FQ_FORMAT_FASTQ_GZ;
+    options.output_format = FQ_FORMAT_FASTQ_GZ;
+    options.interleaving = FQ_FILESET_NONINTERLEAVED;
     
     //Parse the global options:
-    while((option = getopt(argc, (char* const*)argv, "+hvdramulb:B:q:f:i")) != -1){
+    while((option = getopt(argc, (char* const*)argv, "+hvdramulb:B:q:F:f:i")) != -1){
         switch(option){
             case 'h':{global_help(); return FQ_STATUS_OK;}
             case 'v':{global_version(); return FQ_STATUS_OK;}
-            case 'd':{sequence_specified = 1; sequence_flags = sequence_flags | SEQ_DNA; break;}
-            case 'r':{sequence_specified = 1; sequence_flags = sequence_flags | SEQ_RNA; break; }
-            case 'a':{sequence_specified = 1; sequence_flags = sequence_flags | SEQ_AMBIGUOUS; break;}
-            case 'm':{sequence_specified = 1; sequence_flags = sequence_flags | SEQ_MASK; break;}
-            case 'u':{sequence_specified = 1; sequence_flags = sequence_flags | SEQ_UPPERCASE; break;}
-            case 'l':{sequence_specified = 1; sequence_flags = sequence_flags | SEQ_LOWERCASE; break;}
-            case 'b':{input_bufsize = buffer_size(optarg, 1073741824L); break;}
-            case 'B':{output_bufsize = buffer_size(optarg, 1073741824L); break;}
-            case 'f':{input_format = format_type(*optarg); break;}
-            case 'F':{output_format = format_type(*optarg); break;}
-            case 'q':{quality = quality_type(*optarg); break;}
-            case 'i':{interleaving = FQ_FILESET_INTERLEAVED; break;}
+            case 'd':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_DNA; break;}
+            case 'r':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_RNA; break; }
+            case 'a':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_AMBIGUOUS; break;}
+            case 'm':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_MASK; break;}
+            case 'u':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_UPPERCASE; break;}
+            case 'l':{sequence_specified = 1; options.sequence_flags = options.sequence_flags | SEQ_LOWERCASE; break;}
+            case 'b':{options.input_bufsize = buffer_size(optarg, 1073741824L); break;}
+            case 'B':{options.output_bufsize = buffer_size(optarg, 1073741824L); break;}
+            case 'f':{options.input_format = format_type(*optarg); break;}
+            case 'F':{options.output_format = format_type(*optarg); break;}
+            case 'q':{options.quality = quality_type(*optarg); break;}
+            case 'i':{options.interleaving = FQ_FILESET_INTERLEAVED; break;}
             default:{global_usage(); exit(FQ_STATUS_FAIL);}
         }
     }
     
     //Set default sequence flags:
-    if(sequence_specified == 0) sequence_flags = SEQ_DNA | SEQ_UPPERCASE;
-    if(((sequence_flags & SEQ_UPPERCASE) == 0) && ((sequence_flags & SEQ_LOWERCASE) == 0)) sequence_flags = sequence_flags | SEQ_UPPERCASE; // If no case if given, add UPPERCASE
+    if(sequence_specified == 0) options.sequence_flags = SEQ_DNA | SEQ_UPPERCASE;
+    if(((options.sequence_flags & SEQ_UPPERCASE) == 0) && ((options.sequence_flags & SEQ_LOWERCASE) == 0)) options.sequence_flags = options.sequence_flags | SEQ_UPPERCASE; // If no case if given, add UPPERCASE
     
-    printf("input buffer size is %lu bytes\n", input_bufsize);
-    printf("output buffer size is %lu bytes\n", output_bufsize);
-    printf("quality type is %d\n", quality);
-    printf("input format is %d\n", input_format);
-    printf("output format is %d\n", output_format);
-    printf("interleaving is %d\n", interleaving);
+    //Get the requested command:
+    if(optind >= argc){
+        global_usage();
+        return FQ_STATUS_FAIL;
+    }
+    command = (char*)argv[optind];
     
-    return FQ_STATUS_OK;
+    //Farm out the individual commands to their processor functions:
+    // if(strcmp(command, "view") == 0) return fqcommand_view(argc, argv, options);
+    //OTHER COMMANDS TO FOLLOW!
     
-    
-//     fqstatus result;
-//     char finished;
-//     fqbuffer_init(&(read_buffer[0]), 10);
-//     fqbuffer_init(&(read_buffer[1]), 10);
-//     // Set up the callbacks:
-//     set_generic_callbacks(&callbacks);
-//     callbacks.readBuffer = readBuffer;
-//     callbacks.startRead = startRead;
-//     callbacks.endRead = endRead;
-//     callbacks.header1Block = header1Block;
-//     callbacks.sequenceBlock = sequenceBlock;
-//     callbacks.header2Block = header2Block;
-//     callbacks.qualityBlock = qualityBlock;
-//
-//     result = fqinset_open_paired(&fs_in, "./fastq/D0000XXXX-01-1.fastq.gz", "./fastq/D0000XXXX-01-2.fastq.gz", FQ_FORMAT_FASTQ_GZ, &callbacks, 10, 10, SEQ_UPPERCASE|SEQ_DNA, FQ_QTYPE_UNKNOWN);
-//     // result = fqinset_open_single(&fs_in, "./fastq/D0000XXXX-01-1.fastq.gz", FQ_FORMAT_FASTQ_GZ, FQ_FILESET_NONINTERLEAVED, &callbacks, 10, 10, SEQ_UPPERCASE|SEQ_DNA, FQ_QTYPE_UNKNOWN);
-//     if(result != FQ_STATUS_OK){
-//         fprintf(stderr, "ERROR: Failed to open input file.\n");
-//         return 1;
-//     }
-//
-//     result = fqoutset_open_paired(&fs_out, "./out_1.fastq", "./out_2.fastq", FQ_FORMAT_FASTQ);
-//     // result = fqoutset_open_single(&fs_out, "./out_1.fastq", FQ_FORMAT_FASTQ, FQ_FILESET_INTERLEAVED);
-//     if(result != FQ_STATUS_OK){
-//         fprintf(stderr, "ERROR: Failed to open output file.\n");
-//         fqinset_close(&fs_in);
-//         return 1;
-//     }
-//
-//     // Step through the input fileset:
-//     do finished = fqinset_step(&fs_in);
-//     while(finished != 1);
-//
-//     //Done:
-//     fqinset_close(&fs_in);
-//     fqoutset_close(&fs_out);
-//     fqbuffer_free(&(read_buffer[0]));
-//     fqbuffer_free(&(read_buffer[1]));
-//     return 0;
+    //If we get to here, the given command string was invalid:
+    fprintf(stderr, "ERROR: unknown command: \"%s\"\n", command);
+    global_usage();
+    return FQ_STATUS_FAIL;
 }

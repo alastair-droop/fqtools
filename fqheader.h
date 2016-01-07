@@ -35,6 +35,21 @@ typedef unsigned char fqstatus;
 // Define a type for a number of bytes read:
 typedef unsigned long int fqbytecount;
 
+// Define a simple struct to hold the global options:
+typedef struct {
+    fqbytecount input_bufsize;
+    fqbytecount output_bufsize;
+    fqflag sequence_flags;
+    fqflag quality;
+    fqflag input_format;
+    fqflag output_format;
+    fqflag interleaving;
+} fqglobal;
+
+// Define the subcommand processor functions:
+int fqprocess_view(int argc, const char *argv[], fqglobal options);
+
+
 #include "fqbuffer.h"
 #include "fqfile.h"
 #include "fqparser.h"
