@@ -38,12 +38,13 @@ typedef struct {
     fqparser parser_2;
 } fqinset;
 
-fqstatus fqinset_prepare(fqinset *f, fqflag paired, const char *names[], char names_n, fqparser_callbacks *callbacks, fqglobal opt);
+fqstatus fqinset_prepare(fqinset *f, char n_filenames, const char *filenames[], fqparser_callbacks *callbacks, fqglobal opt);
 fqstatus fqinset_open_single(fqinset *fs, char *filename, fqflag format, fqflag interleaved, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding);
 fqstatus fqinset_open_paired(fqinset *fs, char *filename_1, char *filename_2, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding);
 
 fqbytecount fqinset_read(fqinset *fs, char file, char *buffer, fqbytecount buffer_n);
 
+char fqinset_files(fqinset *fs);
 char fqinset_step(fqinset *fs);
 
 // fqbytecount fqinset_read(fqinset *fs, char file, char *buffer, fqbytecount buffer_n);

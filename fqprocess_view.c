@@ -66,37 +66,27 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
         }
     }
     
-    // Work out how many input and output files we'll be writing:
-    char input_n = (argc - optind);
-    char input_paired, output_paired;
-    if ((input_n != 2) && (options.input_interleaving == FQ_FILESET_NONINTERLEAVED)) input_paired = FQ_FILESET_UNPAIRED;
-    else input_paired = FQ_FILESET_PAIRED;
-    if ((input_paired == FQ_FILESET_UNPAIRED) || (options.output_interleaving == FQ_FILESET_INTERLEAVED)) output_paired = FQ_FILESET_UNPAIRED;
-    else output_paired = FQ_FILESET_PAIRED;
-    
-    //Prepare the input file set:
-    result = fqinset_prepare(&f_in, input_paired, argv, argc, &callbacks, options);
+    // Prepare the input file set:
+    result = fqinset_prepare(&f_in, argc - optind, &(argv[optind]), &callbacks, options);
     if(result != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: failed to initialize input\n");
         return FQ_STATUS_FAIL;
     }
     
-    //Set default output format based on calculated input format:
+    // Prepare the output file set:
     if(options.output_format == FQ_FORMAT_UNKNOWN) options.output_format = f_in.format; // Guess by input format
     if(options.output_format == FQ_FORMAT_UNKNOWN) options.output_format = FQ_FORMAT_FASTQ_GZ; // Default to FASTQ.GZ
-
-    //Prepare the output file set:
-    result = fqoutset_prepare(&f_out, output_paired, output_specified, options);
+    result = fqoutset_prepare(&f_out, f_in.paired, output_specified, options);
     if(result != FQ_STATUS_OK){
-        fqinset_close(&f_in);
         fprintf(stderr, "ERROR: failed to initialize output\n");
+        fqinset_close(&f_in);
         return FQ_STATUS_FAIL;
     }
-
+    
     //Initialize the output read buffers:
     fqbuffer_init(&(read_buffer[0]), 250);
-    if(input_paired == FQ_FILESET_PAIRED) fqbuffer_init(&(read_buffer[1]), 250);
-    
+    if(fqinset_files(&f_in) == 2) fqbuffer_init(&(read_buffer[1]), 250);
+
     //Set the callbacks:
     set_generic_callbacks(&callbacks);
     callbacks.readBuffer = readBuffer;
@@ -111,11 +101,11 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     // Step through the input fileset:
     do finished = fqinset_step(&f_in);
     while(finished != 1);
-
+   
     // Clean up:
     fqinset_close(&f_in);
     fqoutset_close(&f_out);
     fqbuffer_free(&(read_buffer[0]));
-    if(input_paired == FQ_FILESET_PAIRED) fqbuffer_free(&(read_buffer[1]));
+    if(fqinset_files(&f_in) == 2) fqbuffer_free(&(read_buffer[1]));
     return FQ_STATUS_OK;
 }

@@ -31,7 +31,7 @@ fqstatus fqoutset_open_single(fqoutset *fs, char *filename, fqflag format, fqfla
     result = fqfile_open(&(fs->file_1), filename, FQ_MODE_WRITE, format);
     if(result != FQ_STATUS_OK) return FQ_STATUS_FAIL;
     fs->paired = FQ_FILESET_UNPAIRED;
-    fs->format = format;
+    fs->format = fs->file_1.format;
     fs->interleaved = interleaved;
     return FQ_STATUS_OK;
 }
@@ -48,7 +48,7 @@ fqstatus fqoutset_open_paired(fqoutset *fs, char *filename_1, char *filename_2, 
         return FQ_STATUS_FAIL;
     }
     fs->paired = FQ_FILESET_PAIRED;
-    fs->format = format;
+    fs->format = fs->file_1.format;
     fs->interleaved = FQ_FILESET_NONINTERLEAVED;
     return FQ_STATUS_OK;
 }
@@ -80,10 +80,10 @@ void fqoutset_close(fqoutset *fs){
     if(fs->paired == FQ_FILESET_PAIRED) fqfile_close(&(fs->file_2));
 }
 
-fqstatus fqinset_prepare(fqinset *f, fqflag paired, const char *names[], char names_n, fqparser_callbacks *callbacks, fqglobal opt){
-    if((paired == FQ_FILESET_UNPAIRED) && (names_n == 0)) return fqinset_open_single(f, NULL, opt.input_format, opt.input_interleaving, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
-    if(paired == FQ_FILESET_UNPAIRED) return fqinset_open_single(f, (char*)names[names_n - 1], opt.input_format, opt.input_interleaving, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
-    return fqinset_open_paired(f, (char*)names[names_n - 2], (char*)names[names_n - 1], opt.input_format, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
+fqstatus fqinset_prepare(fqinset *f, char n_filenames, const char *filenames[], fqparser_callbacks *callbacks, fqglobal opt){
+    if(n_filenames == 0) return fqinset_open_single(f, NULL, opt.input_format, opt.input_interleaving, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
+    if(n_filenames == 1) return fqinset_open_single(f, (char*)filenames[0], opt.input_format, opt.input_interleaving, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
+    return fqinset_open_paired(f, (char*)filenames[0], (char*)filenames[1], opt.input_format, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
 }
 
 fqstatus fqinset_open_single(fqinset *fs, char *filename, fqflag format, fqflag interleaved, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
@@ -98,7 +98,7 @@ fqstatus fqinset_open_single(fqinset *fs, char *filename, fqflag format, fqflag 
         return FQ_STATUS_FAIL;
     }
     fs->paired = FQ_FILESET_UNPAIRED;
-    fs->format = format;
+    fs->format = fs->file_1.format;
     fs->interleaved = interleaved;
     return FQ_STATUS_OK;
 }
@@ -127,7 +127,7 @@ fqstatus fqinset_open_paired(fqinset *fs, char *filename_1, char *filename_2, fq
         return FQ_STATUS_FAIL;
     }
     fs->paired = FQ_FILESET_PAIRED;
-    fs->format = format;
+    fs->format = fs->file_1.format;
     fs->interleaved = FQ_FILESET_NONINTERLEAVED;
     return FQ_STATUS_OK;
 }
@@ -138,6 +138,11 @@ fqbytecount fqinset_read(fqinset *fs, char file, char *buffer, fqbytecount buffe
     if(file == FQ_FILESET_PAIR_1) return fqfile_read(&(fs->file_1), buffer, buffer_n);
     if(file == FQ_FILESET_PAIR_2) return fqfile_read(&(fs->file_2), buffer, buffer_n);
     return 0;
+}
+
+char fqinset_files(fqinset *fs){
+    if((fs->paired == FQ_FILESET_PAIRED) || (fs->interleaved == FQ_FILESET_INTERLEAVED)) return 2;
+    return 1;
 }
 
 char fqinset_step(fqinset *fs){
