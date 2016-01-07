@@ -1,53 +1,52 @@
 #include "fqheader.h"
 
 // Define the global variables:
-fqinset f_in;
-fqoutset f_out;
+fqfsin f_in;
+fqfsout f_out;
 fqparser_callbacks callbacks;
-fqbuffer read_buffer[2];
+char interleaving;
 
 fqbytecount readBuffer(void *user, char *b, fqbytecount b_size){
-    return fqinset_read(&f_in, (char)user, b, b_size);
+    return fqfile_read(&(f_in.files[(int)user]->file), b, b_size);
 }
 
 void startRead(void *user){
-    fqbuffer_appendchar(&(read_buffer[(int)user]), '@');
+    fqfsout_writechar(&f_out, (int)user, '@');
 }
 
 void endRead(void *user){
-    read_buffer[(int)user].data[read_buffer[(int)user].offset] = '\0';
-    fqoutset_write(&f_out, (char)user, read_buffer[(int)user].data, read_buffer[(int)user].offset);
-    fqbuffer_reset(&(read_buffer[(int)user]));
+    if(interleaving == 1)fqfsout_flush(&f_out, (int)user);
 }
 
 void header1Block(void *user, char *block, fqbytecount block_n, char final){
-    fqbuffer_append(&(read_buffer[(int)user]), block, block_n);
-    if(final == 1) fqbuffer_appendchar(&(read_buffer[(int)user]), '\n');
+    fqfsout_write(&f_out, (int)user, block, block_n);
+    if(final == 1) fqfsout_writechar(&f_out, (int)user, '\n');
 }
 
 void header2Block_keep(void *user, char *block, fqbytecount block_n, char final){
-    fqbuffer_append(&(read_buffer[(int)user]), block, block_n);
-    if(final == 1) fqbuffer_appendchar(&(read_buffer[(int)user]), '\n');
+    fqfsout_write(&f_out, (int)user, block, block_n);
+    if(final == 1) fqfsout_writechar(&f_out, (int)user, '\n');
 }
 
 void header2Block_discard(void *user, char *block, fqbytecount block_n, char final){
-    if(final == 1) fqbuffer_appendchar(&(read_buffer[(int)user]), '\n');
+    if(final == 1) fqfsout_writechar(&f_out, (int)user, '\n');
 }
 
 void sequenceBlock(void *user, char *block, fqbytecount block_n, char final){
-    fqbuffer_append(&(read_buffer[(int)user]), block, block_n);
+    fqfsout_write(&f_out, (int)user, block, block_n);
     if(final == 1){
-        fqbuffer_appendchar(&(read_buffer[(int)user]), '\n');
-        fqbuffer_appendchar(&(read_buffer[(int)user]), '+');
-    } 
+        fqfsout_writechar(&f_out, (int)user, '\n');
+        fqfsout_writechar(&f_out, (int)user, '+');
+    }
 }
 
 void qualityBlock(void *user, char *block, fqbytecount block_n, char final){
-    fqbuffer_append(&(read_buffer[(int)user]), block, block_n);
-    if(final == 1) fqbuffer_appendchar(&(read_buffer[(int)user]), '\n');
+    fqfsout_write(&f_out, (int)user, block, block_n);
+    if(final == 1) fqfsout_writechar(&f_out, (int)user, '\n');
 }
 
 int fqprocess_view(int argc, const char *argv[], fqglobal options){
+    interleaving = options.output_interleaving;
     int option;
     char keep_headers = 0;
     char output_specified = 0;
@@ -67,25 +66,19 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     }
     
     // Prepare the input file set:
-    result = fqinset_prepare(&f_in, argc - optind, &(argv[optind]), &callbacks, options);
+    result = fqfsin_prepare(&f_in, argc - optind, &(argv[optind]), &callbacks, options);
     if(result != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: failed to initialize input\n");
         return FQ_STATUS_FAIL;
     }
     
     // Prepare the output file set:
-    if(options.output_format == FQ_FORMAT_UNKNOWN) options.output_format = f_in.format; // Guess by input format
-    if(options.output_format == FQ_FORMAT_UNKNOWN) options.output_format = FQ_FORMAT_FASTQ_GZ; // Default to FASTQ.GZ
-    result = fqoutset_prepare(&f_out, f_in.paired, output_specified, options);
+    result = fqfsout_prepare(&f_out, f_in.n_files, output_specified, options, f_in.files[0]->file.format, f_in.files[1]->file.format);
     if(result != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: failed to initialize output\n");
-        fqinset_close(&f_in);
+        fqfsin_close(&f_in);
         return FQ_STATUS_FAIL;
     }
-    
-    //Initialize the output read buffers:
-    fqbuffer_init(&(read_buffer[0]), 250);
-    if(fqinset_files(&f_in) == 2) fqbuffer_init(&(read_buffer[1]), 250);
 
     //Set the callbacks:
     set_generic_callbacks(&callbacks);
@@ -99,13 +92,11 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     callbacks.qualityBlock = qualityBlock;
 
     // Step through the input fileset:
-    do finished = fqinset_step(&f_in);
+    do finished = fqfsin_step(&f_in);
     while(finished != 1);
-   
+
     // Clean up:
-    fqinset_close(&f_in);
-    fqoutset_close(&f_out);
-    fqbuffer_free(&(read_buffer[0]));
-    if(fqinset_files(&f_in) == 2) fqbuffer_free(&(read_buffer[1]));
+    fqfsin_close(&f_in);
+    fqfsout_close(&f_out);
     return FQ_STATUS_OK;
 }
