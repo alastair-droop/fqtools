@@ -6,6 +6,10 @@
 #include <string.h>
 #include <zlib.h>
 
+// Set the current version data:
+#define PROG_NAME "fqtools"
+#define FQTOOLS_VERSION "2.0 2016-01-07"
+
 // Define the flag type:
 typedef unsigned char fqflag;
 
@@ -15,12 +19,12 @@ typedef unsigned char fqstatus;
 #define FQ_STATUS_FAIL 1
 
 // Define the sequence types:
-#define SEQ_DNA 64
-#define SEQ_RNA 32
-#define SEQ_AMBIGUOUS 16
-#define SEQ_MASK 8
-#define SEQ_LOWERCASE 4
-#define SEQ_UPPERCASE 2
+#define SEQ_DNA (1 << 5)
+#define SEQ_RNA (1 << 4)
+#define SEQ_AMBIGUOUS (1 << 3)
+#define SEQ_MASK (1 << 2)
+#define SEQ_UPPERCASE (1 << 1)
+#define SEQ_LOWERCASE (1 << 0)
 
 // Define the FASTQ quality encodings:
 #define FQ_QTYPE_UNKNOWN 0
