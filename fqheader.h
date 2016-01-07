@@ -36,5 +36,6 @@ typedef unsigned long int fqbytecount;
 #include "fqparser.h"
 #include "fqfileset.h"
 #include "fqgenerics.h"
+#include "fqhelp.h"
 
 #endif
