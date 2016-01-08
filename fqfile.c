@@ -5,10 +5,11 @@ fqstatus fqfile_open(fqfile *f, char *filename, fqflag mode, fqflag format){
     if(format == FQ_FORMAT_UNKNOWN) format = guess_file_format(filename);
     if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_read_file_fastq_uncompressed(f, filename);
     if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_FASTQ_GZ)) return fqfile_open_read_file_fastq_compressed(f, filename);
+    if((mode == FQ_MODE_READ) && (format == FQ_FORMAT_BAM)) return fqfile_open_read_file_bam(f, filename);
     if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ)) return fqfile_open_write_file_fastq_uncompressed(f, filename);
     if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTQ_GZ)) return fqfile_open_write_file_fastq_compressed(f, filename);
     if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTA)) return fqfile_open_write_file_fastq_uncompressed(f, filename);
-    if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTA_GZ)) return fqfile_open_write_file_fastq_compressed(f, filename);    
+    if((mode == FQ_MODE_WRITE) && (format == FQ_FORMAT_FASTA_GZ)) return fqfile_open_write_file_fastq_compressed(f, filename);
     return FQ_STATUS_FAIL;
 }
 
@@ -90,6 +91,37 @@ fqstatus fqfile_open_read_file_fastq_compressed(fqfile *f, char *filename){
     return FQ_STATUS_OK;
 }
 
+fqstatus fqfile_open_read_file_bam(fqfile *f, char *filename){
+    if(filename == NULL){
+        // Reading from a stream, (i.e. stdin):
+        f->handle = (samFile*)sam_open("-", "r");
+        if(f->handle == NULL) return FQ_STATUS_FAIL;
+        f->type = FQ_TYPE_PIPE;
+        f->eof = fqfile_eof_file_bam;
+        f->flush = fqfile_flush_file_bam;
+        f->close = fqfile_close_file_bam;
+    } else {
+        f->handle = (samFile*)sam_open(filename, "r");
+        if(f->handle == NULL) return FQ_STATUS_FAIL;
+        f->type = FQ_TYPE_FILE;
+        f->eof = fqfile_eof_file_bam;
+        f->flush = fqfile_flush_file_bam;
+        f->close = fqfile_close_file_bam;
+    }
+    f->sam_header = sam_hdr_read((samFile*)(f->handle));
+    if(f->sam_header == NULL){
+        sam_close((samFile*)(f->handle));
+        return FQ_STATUS_FAIL;
+    }
+    f->bam_data = bam_init1();
+    f->mode = FQ_MODE_READ;
+    f->format = FQ_FORMAT_BAM;
+    f->read = fqfile_read_bam;
+    f->write = NULL;
+    f->writechar = NULL;
+    return FQ_STATUS_OK;
+}
+
 fqstatus fqfile_open_write_file_fastq_uncompressed(fqfile *f, char *filename){
     if(filename == NULL){
         // Writing from a stream, (i.e. stdout):
@@ -145,6 +177,11 @@ void fqfile_close_file_fastq_compressed(fqfile *f){
     if((gzFile*)(f->handle) != NULL) gzclose((gzFile*)(f->handle));
 }
 
+void fqfile_close_file_bam(fqfile *f){
+    if((samFile*)(f->handle) != NULL) sam_close((samFile*)(f->handle));
+    if(f->sam_header != NULL) bam_hdr_destroy(f->sam_header);
+}
+
 void fqfile_close_pipe(fqfile *f){
     return;
 }
@@ -160,6 +197,47 @@ fqbytecount fqfile_read_fastq_uncompressed(fqfile *f, char *buffer, fqbytecount 
 fqbytecount fqfile_read_fastq_compressed(fqfile *f, char *buffer, fqbytecount buffer_n){
     if(((fqfile*)f)->mode != FQ_MODE_READ) return 0; // Check that we're allowed to read from this file
     return (fqbytecount)gzread((gzFile*)(((fqfile*)f)->handle), buffer, (int)buffer_n); // Read into the buffer
+}
+
+fqbytecount fqfile_read_bam(fqfile *f, char *buffer, fqbytecount buffer_n){
+    char read_reversed;
+    char *read_pair;
+    fqbytecount n_total = 0;
+    int bytes_read = sam_read1((samFile*)(f->handle), f->sam_header, f->bam_data);
+    if(bytes_read >= 0){
+        //Find out how long out output buffer will be:
+        n_total = f->bam_data->core.l_qname + (2 * f->bam_data->core.l_qseq) + 6;
+        if(n_total > buffer_n){
+            fprintf(stderr, "ERROR: input buffer not long enough for a full BAM read (%lu bytes)\n", n_total);
+            return 0;
+        }
+        n_total = 0;
+        read_reversed = f->bam_data->core.flag & BAM_FREVERSE;
+        read_pair = "0";
+        if((f->bam_data->core.flag & BAM_FREAD1) && !(f->bam_data->core.flag & BAM_FREAD2)) read_pair = "1";
+        if((f->bam_data->core.flag & BAM_FREAD2) && !(f->bam_data->core.flag & BAM_FREAD1)) read_pair = "2";
+        //Put the header into the buffer:
+        memcpy(buffer, "@", 1);
+        n_total++;
+        memcpy(buffer+n_total, bam_get_qname(f->bam_data), f->bam_data->core.l_qname - 1);
+        n_total += f->bam_data->core.l_qname - 1;
+        memcpy(buffer+n_total, ":", 1);
+        n_total++;
+        memcpy(buffer+n_total, read_pair, 1);
+        n_total++;
+        memcpy(buffer+n_total, "\n", 1);
+        n_total++;
+        // Put the sequence into the buffer:
+        convert_sequence((char*)bam_get_seq(f->bam_data), buffer+n_total, f->bam_data->core.l_qseq, read_reversed);
+        n_total += f->bam_data->core.l_qseq;
+        memcpy(buffer+n_total, "\n+\n", 3);
+        n_total += 3;
+        // Put the quality in:
+        convert_quality((char*)bam_get_qual(f->bam_data), buffer+n_total, f->bam_data->core.l_qseq, read_reversed, 33);
+        n_total += f->bam_data->core.l_qseq;        
+        memcpy(buffer+n_total, "\n", 1);
+    }
+    return n_total;
 }
 
 // Callbacks to write buffer data to file:
@@ -194,6 +272,10 @@ char fqfile_eof_file_fastq_compressed(fqfile *f){
     return gzeof((gzFile*)(((fqfile*)f)->handle));
 }
 
+char fqfile_eof_file_bam(fqfile *f){
+    return 0; // Placeholder for now.
+}
+
 char fqfile_eof_pipe(fqfile *f){
     return fqfile_eof_file_fastq_uncompressed(f);
 }
@@ -205,7 +287,10 @@ void fqfile_flush_file_fastq_uncompressed(fqfile *f){
 
 void fqfile_flush_file_fastq_compressed(fqfile *f){
     gzflush((gzFile*)(((fqfile*)f)->handle), 0);
-    
+}
+
+void fqfile_flush_file_bam(fqfile *f){
+    // Placeholder for now.
 }
 
 void fqfile_flush_pipe(fqfile *f){
@@ -270,13 +355,13 @@ fqflag guess_filename_format(char *filename){
     if(f == NULL) return FQ_FORMAT_UNKNOWN;
     f[strlen(filename)] = '\0';
     for(i=0; i < strlen(filename); i++) f[i] = tolower(filename[i]);
-    if(strstr(filename, ".fastq.gz") != NULL) result = FQ_FORMAT_FASTQ_GZ;
-    if(strstr(filename, ".fastq") != NULL) result = FQ_FORMAT_FASTQ;
-    if(strstr(filename, ".fasta.gz") != NULL) result = FQ_FORMAT_FASTA_GZ;
-    if(strstr(filename, ".fasta") != NULL) result = FQ_FORMAT_FASTA;
-    if(strstr(filename, ".bam") != NULL) result = FQ_FORMAT_BAM;
+    if(strstr(f, ".fastq.gz") != NULL) result = FQ_FORMAT_FASTQ_GZ;
+    if(strstr(f, ".fastq") != NULL) result = FQ_FORMAT_FASTQ;
+    if(strstr(f, ".fasta.gz") != NULL) result = FQ_FORMAT_FASTA_GZ;
+    if(strstr(f, ".fasta") != NULL) result = FQ_FORMAT_FASTA;
+    if(strstr(f, ".bam") != NULL) result = FQ_FORMAT_BAM;
     free(f);
-    return FQ_FORMAT_UNKNOWN;
+    return result;
 }
 
 // Guess the file format by peeking into the file, and looking at the magic number:
@@ -298,4 +383,37 @@ fqflag guess_stdin_format(){
     // successfully pop it back. Untill I can do this without breaking the stream,
     // we simply pass out "No idea" and rely on a safe default in main.
     return FQ_FORMAT_UNKNOWN;
+}
+
+void convert_sequence(char *in_seq, char *out_seq, int n, char reversed){
+    int8_t seq_comp_table[16] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
+    char *p = out_seq;
+    int i;
+    if(reversed == 1){
+        for(i = n - 1; i > -1; --i){
+            *p = seq_nt16_str[seq_comp_table[bam_seqi(in_seq, i)]];
+            p++;
+        }
+    } else {
+        for(i = 0; i < n; ++i){
+            *p = seq_nt16_str[bam_seqi(in_seq, i)];
+            p++;
+        }        
+    }
+}
+
+void convert_quality(char *in_qual, char *out_qual, int n, char reversed, char offset){
+    char *p = out_qual;
+    int i;
+    if(reversed == 1){
+        for(i = n - 1; i > -1; --i){
+            *p = in_qual[i] + offset;
+            p++;
+        }
+    } else {
+        for(i = 0; i < n; ++i){
+            *p = (char)(in_qual[i]) + offset;
+            p++;
+        }
+    }
 }
