@@ -83,9 +83,10 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     // Step through the input fileset:
     do finished = fqfsin_step(&f_in);
     while(finished != 1);
-
+    result = f_in.status;
+    
     // Clean up:
     fqfsin_close(&f_in);
     fqfsout_close(&f_out);
-    return FQ_STATUS_OK;
+    return result;
 }

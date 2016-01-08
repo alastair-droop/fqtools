@@ -28,6 +28,7 @@ fqstatus fqfsin_open_single(fqfsin *f, const char *filename, fqflag format, fqpa
     }
     f->files[1] = f->files[0];
     f->n_files = 1;
+    f->status = FQ_STATUS_OK;
     return FQ_STATUS_OK;
 }
 
@@ -55,6 +56,7 @@ fqstatus fqfsin_open_paired(fqfsin *f, const char *filename_1, const char *filen
     }
     f->files[1]->parser.pair = 1;
     f->n_files = 2;
+    f->status = FQ_STATUS_OK;
     return FQ_STATUS_OK;
 }
 
@@ -62,6 +64,7 @@ char fqfsin_step(fqfsin *f){
     char finished_1, finished_2;
     int error_file, error_pair;
     fqbytecount n1, n2;
+    f->status = FQ_STATUS_OK;
     finished_1 = fqparser_step(&(f->files[FQ_PAIR_1]->parser));
     if(f->n_files == 1){
         // SINGLE PARSER
@@ -83,6 +86,7 @@ char fqfsin_step(fqfsin *f){
     }
     f->files[error_file]->parser.callbacks->error(error_pair, FQ_ERROR_PAIR_MISMATCH, f->files[error_file]->parser.line_number, f->files[error_file]->parser.current_character);
     f->files[error_file]->parser.error = 1;
+    f->status = FQ_STATUS_FAIL;
     return FQ_PARSER_COMPLETE;
 }
 
