@@ -50,7 +50,7 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     int option;
     fqstatus result;
     char finished = 0;
-    //
+
     //Parse the subcommand options:
     optind++; // Skip the subcommand argument
     while((option = getopt(argc, (char* const*)argv, "+hko:")) != -1){
@@ -62,6 +62,7 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
         }
     }
 
+    //Prepare the IO file sets:
     result = prepare_filesets(&f_in, &f_out, argc - optind, &(argv[optind]), &callbacks, options);
     if(result != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: failed to initialize IO\n");
@@ -83,7 +84,7 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     do finished = fqfsin_step(&f_in);
     while(finished != 1);
 
-    // // Clean up:
+    // Clean up:
     fqfsin_close(&f_in);
     fqfsout_close(&f_out);
     return FQ_STATUS_OK;
