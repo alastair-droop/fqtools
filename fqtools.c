@@ -55,9 +55,13 @@ int main(int argc, const char *argv[]){
     options.quality = FQ_QTYPE_UNKNOWN;
     options.input_format = FQ_FORMAT_UNKNOWN;
     options.output_format = FQ_FORMAT_UNKNOWN;
+    options.default_input_format = FQ_FORMAT_FASTQ_GZ;
+    options.default_output_format = FQ_FORMAT_FASTQ_GZ;
     options.input_interleaving = FQ_NONINTERLEAVED;
     options.output_interleaving = FQ_NONINTERLEAVED;
     options.file_pair_replacement = '%';
+    options.keep_headers = 0;
+    options.output_filename_specified = 0;
     
     //Parse the global options:
     while((option = getopt(argc, (char* const*)argv, "+hvdramulp:b:B:q:F:f:iI")) != -1){

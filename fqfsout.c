@@ -40,37 +40,6 @@ void fqbfile_close(fqbfile *f){
     fqbuffer_free(&(f->buffer));
 }
 
-fqstatus fqfsout_prepare(fqfsout *f, char input_files, char specify_filename, fqglobal opt, fqflag default_format_1, fqflag default_format_2){
-    fqstatus result;
-    char *filename_1 = NULL;
-    char *filename_2 = NULL;
-    fqflag format_1 = opt.output_format;
-    fqflag format_2 = opt.output_format;
-    char n_filenames = 2;
-    if((input_files == 1) || (opt.output_interleaving == FQ_INTERLEAVED)) n_filenames = 1;
-    if(format_1 == FQ_FORMAT_UNKNOWN) format_1 = default_format_1;
-    if(format_2 == FQ_FORMAT_UNKNOWN) format_2 = default_format_2;    
-    if((n_filenames == 1) && (specify_filename == 0)) return fqfsout_open_single(f, NULL, format_1, opt.output_bufsize);
-    if((n_filenames == 1) && (specify_filename == 1)){
-        filename_1 = generate_filename(opt.file_output_stem, opt.file_pair_replacement, 0, format_1);
-        if(filename_1 == NULL) return FQ_STATUS_FAIL;
-        result = fqfsout_open_single(f, filename_1, format_1, opt.output_bufsize);
-        free(filename_1);
-        return result;
-    }
-    filename_1 = generate_filename(opt.file_output_stem, opt.file_pair_replacement, 1, format_1);
-    if(filename_1 == NULL) return FQ_STATUS_FAIL;
-    filename_2 = generate_filename(opt.file_output_stem, opt.file_pair_replacement, 2, format_2);
-    if(filename_2 == NULL){
-        free(filename_1);
-        return FQ_STATUS_FAIL;  
-    }
-    result = fqfsout_open_paired(f, filename_1, filename_2, format_1, format_2, opt.output_bufsize);
-    free(filename_1);
-    free(filename_2);
-    return result;
-}
-
 fqstatus fqfsout_open_single(fqfsout *f, const char *filename, fqflag format, fqbytecount b_size){
     fqstatus result;
     f->files[0] = malloc(sizeof(fqbfile));

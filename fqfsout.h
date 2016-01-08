@@ -18,7 +18,6 @@ typedef struct{
     fqbfile *files[2];
 } fqfsout;
 
-fqstatus fqfsout_prepare(fqfsout *f, char input_files, char specify_filename, fqglobal opt, fqflag default_format_1, fqflag default_format_2);
 fqstatus fqfsout_open_single(fqfsout *f, const char *filename, fqflag format, fqbytecount b_size);
 fqstatus fqfsout_open_paired(fqfsout *f, const char *filename_1, const char *filename_2, fqflag format_1, fqflag format_2, fqbytecount b_size);
 fqstatus fqfsout_writechar(fqfsout *f, int file, char c);

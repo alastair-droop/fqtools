@@ -1,6 +1,6 @@
 #include "fqheader.h"
 
-fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, void *user){
+fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved, int user){
     p->input_buffer = (char*)malloc(in_bufsize * sizeof(char));
     if(p->input_buffer == NULL) return FQ_STATUS_FAIL;
     p->output_buffer = (char*)malloc((out_bufsize + 1) * sizeof(char));
@@ -29,6 +29,7 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
     p->output_buffer_max = out_bufsize;
     p->output_buffer_offset = 0;
     p->output_buffer[p->output_buffer_max] = '\0';
+    p->interleaved = interleaved;
     p->user = user;
     p->callbacks = callbacks;
     p->entry_point = FQ_PARSER_ENTRY_START;
@@ -305,6 +306,7 @@ entry_quality:
 						p->output_buffer_offset = 0;
 						p->current_state = FQ_PARSER_STATE_INIT;
 						p->callbacks->endRead(p->user);
+                        if(p->interleaved == FQ_INTERLEAVED) p->user = !(p->user);
 						p->entry_point = FQ_PARSER_ENTRY_LOOP;
 						return FQ_PARSER_INCOMPLETE;
 					}

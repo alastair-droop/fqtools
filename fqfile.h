@@ -1,17 +1,5 @@
 #include "fqheader.h"
 
-// Define the file mode flag bits:
-#define FQ_MODE_READ 0
-#define FQ_MODE_WRITE 1
-
-#define FQ_TYPE_PIPE 0
-#define FQ_TYPE_FILE 1
-
-#define FQ_FORMAT_UNKNOWN 0
-#define FQ_FORMAT_FASTQ 1
-#define FQ_FORMAT_FASTQ_GZ 2
-#define FQ_FORMAT_BAM 3
-
 // Define the structure that will describe a single file:
 typedef struct fqfile fqfile;
 struct fqfile {

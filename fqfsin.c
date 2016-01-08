@@ -1,10 +1,10 @@
 #include "fqheader.h"
 
-fqstatus fqpfile_open(fqpfile *f, const char *filename, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
+fqstatus fqpfile_open(fqpfile *f, const char *filename, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved){
     fqstatus result;
     result = fqfile_open(&(f->file), (char*)filename, FQ_MODE_READ, format);
     if(result != FQ_STATUS_OK) return result;
-    result = fqparser_init(&(f->parser), callbacks, in_bufsize, out_bufsize, seq_flags, encoding, 0);
+    result = fqparser_init(&(f->parser), callbacks, in_bufsize, out_bufsize, seq_flags, encoding, interleaved, 0);
     if(result != FQ_STATUS_OK){
         fqfile_close(&(f->file));
         return result;
@@ -17,17 +17,11 @@ void fqpfile_close(fqpfile *f){
     fqparser_free(&(f->parser));
 }
 
-fqstatus fqfsin_prepare(fqfsin *f, char n_filenames, const char *filenames[], fqparser_callbacks *callbacks, fqglobal opt){
-    if(n_filenames == 0) return fqfsin_open_single(f, NULL, opt.input_format, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
-    if(n_filenames == 1) return fqfsin_open_single(f, (char*)filenames[0], opt.input_format, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
-    return fqfsin_open_paired(f, (char*)filenames[0], (char*)filenames[1], opt.input_format, opt.input_format, callbacks, opt.input_bufsize, opt.output_bufsize, opt.sequence_flags, opt.quality);
-}
-
-fqstatus fqfsin_open_single(fqfsin *f, const char *filename, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding){
+fqstatus fqfsin_open_single(fqfsin *f, const char *filename, fqflag format, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved){
     fqstatus result;
     f->files[0] = malloc(sizeof(fqpfile));
     if(f->files[0] == NULL) return FQ_STATUS_FAIL;
-    result = fqpfile_open(f->files[0], filename, format, callbacks, in_bufsize, out_bufsize, seq_flags, encoding);
+    result = fqpfile_open(f->files[0], filename, format, callbacks, in_bufsize, out_bufsize, seq_flags, encoding, interleaved);
     if(result != FQ_STATUS_OK){
         free(f->files[0]);
         return result;
@@ -46,20 +40,20 @@ fqstatus fqfsin_open_paired(fqfsin *f, const char *filename_1, const char *filen
         free(f->files[0]);
         return FQ_STATUS_FAIL;
     }
-    result = fqpfile_open(f->files[0], filename_1, format_1, callbacks, in_bufsize, out_bufsize, seq_flags, encoding);
+    result = fqpfile_open(f->files[0], filename_1, format_1, callbacks, in_bufsize, out_bufsize, seq_flags, encoding, FQ_NONINTERLEAVED);
     if(result != FQ_STATUS_OK){
         free(f->files[0]);
         free(f->files[1]);
         return result;
     }
-    result = fqpfile_open(f->files[1], filename_2, format_2, callbacks, in_bufsize, out_bufsize, seq_flags, encoding);
+    result = fqpfile_open(f->files[1], filename_2, format_2, callbacks, in_bufsize, out_bufsize, seq_flags, encoding, FQ_NONINTERLEAVED);
     if(result != FQ_STATUS_OK){
         fqpfile_close(f->files[0]);
         free(f->files[0]);
         free(f->files[1]);
         return result;
     }
-    f->files[1]->parser.user = (void*)1;
+    f->files[1]->parser.user = 1;
     f->n_files = 2;
     return FQ_STATUS_OK;
 }

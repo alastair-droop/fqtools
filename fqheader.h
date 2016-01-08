@@ -32,6 +32,18 @@ typedef unsigned char fqstatus;
 #define FQ_QTYPE_SOLEXA 59
 #define FQ_QTYPE_ILLUMINA 64
 
+// Define the file mode flag bits:
+#define FQ_MODE_READ 0
+#define FQ_MODE_WRITE 1
+
+#define FQ_TYPE_PIPE 0
+#define FQ_TYPE_FILE 1
+
+#define FQ_FORMAT_UNKNOWN 0
+#define FQ_FORMAT_FASTQ 1
+#define FQ_FORMAT_FASTQ_GZ 2
+#define FQ_FORMAT_BAM 3
+
 // Define the file set types:
 #define FQ_UNPAIRED 0
 #define FQ_PAIRED 1
@@ -53,8 +65,12 @@ typedef struct {
     fqflag quality;
     fqflag input_format;
     fqflag output_format;
+    fqflag default_input_format;
+    fqflag default_output_format;
     fqflag input_interleaving;
     fqflag output_interleaving;
+    char keep_headers;
+    char output_filename_specified;
     char file_pair_replacement;
     char *file_output_stem;
 } fqglobal;
@@ -68,6 +84,7 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options);
 #include "fqparser.h"
 #include "fqfsin.h"
 #include "fqfsout.h"
+#include "fqfileprep.h"
 #include "fqgenerics.h"
 #include "fqhelp.h"
 
