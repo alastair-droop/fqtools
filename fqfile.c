@@ -263,17 +263,20 @@ char* generate_filename(char *stem, char rep_chr, char pair, fqflag format){
 
 // Guess the file format by its name:
 fqflag guess_filename_format(char *filename){
+    fqflag result = FQ_FORMAT_UNKNOWN;
+    int i;
     if(filename == NULL) return guess_stdin_format();
-    if(strcasestr(filename, ".fastq.gz") != NULL) return FQ_FORMAT_FASTQ_GZ;
-    if(strcasestr(filename, ".fastq") != NULL) return FQ_FORMAT_FASTQ;
-    if(strcasestr(filename, ".fasta.gz") != NULL) return FQ_FORMAT_FASTA_GZ;
-    if(strcasestr(filename, ".fasta") != NULL) return FQ_FORMAT_FASTA;
-    if(strcasestr(filename, ".bam") != NULL) return FQ_FORMAT_BAM;
+    char *f = malloc(sizeof(char) * (strlen(filename) + 1));
+    if(f == NULL) return FQ_FORMAT_UNKNOWN;
+    f[strlen(filename)] = '\0';
+    for(i=0; i < strlen(filename); i++) f[i] = tolower(filename[i]);
+    if(strstr(filename, ".fastq.gz") != NULL) result = FQ_FORMAT_FASTQ_GZ;
+    if(strstr(filename, ".fastq") != NULL) result = FQ_FORMAT_FASTQ;
+    if(strstr(filename, ".fasta.gz") != NULL) result = FQ_FORMAT_FASTA_GZ;
+    if(strstr(filename, ".fasta") != NULL) result = FQ_FORMAT_FASTA;
+    if(strstr(filename, ".bam") != NULL) result = FQ_FORMAT_BAM;
+    free(f);
     return FQ_FORMAT_UNKNOWN;
-    // if(filename == NULL) return guess_stdin_format();
-    // if(strlen(filename) < 3) return guess_file_format(filename);
-    // if(strncmp(filename + (strlen(filename) - 3), ".gz", 3) == 0) return FQ_FORMAT_FASTQ_GZ;
-    // return FQ_FORMAT_FASTQ;
 }
 
 // Guess the file format by peeking into the file, and looking at the magic number:
