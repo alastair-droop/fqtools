@@ -4,8 +4,7 @@
 fqfsin f_in;
 fqfsout f_out;
 fqparser_callbacks callbacks;
-char interleaving_out, interleaving_in;
-char f_number;
+char interleaving_out;
 
 fqbytecount readBuffer(int user, char *b, fqbytecount b_size){
     return fqfile_read(&(f_in.files[user]->file), b, b_size);
@@ -47,14 +46,12 @@ void qualityBlock(int user, char *block, fqbytecount block_n, char final){
 }
 
 int fqprocess_view(int argc, const char *argv[], fqglobal options){
-    interleaving_in = options.input_interleaving;
     interleaving_out = options.output_interleaving;
     int option;
     fqstatus result;
     char finished = 0;
     //
     //Parse the subcommand options:
-    options.file_output_stem = "output%";
     optind++; // Skip the subcommand argument
     while((option = getopt(argc, (char* const*)argv, "+hko:")) != -1){
         switch(option){

@@ -59,6 +59,7 @@ int main(int argc, const char *argv[]){
     options.default_output_format = FQ_FORMAT_FASTQ_GZ;
     options.input_interleaving = FQ_NONINTERLEAVED;
     options.output_interleaving = FQ_NONINTERLEAVED;
+    options.file_output_stem = "output%";
     options.file_pair_replacement = '%';
     options.keep_headers = 0;
     options.output_filename_specified = 0;
