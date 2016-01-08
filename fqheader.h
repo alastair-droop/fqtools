@@ -76,7 +76,8 @@ typedef struct {
 } fqglobal;
 
 // Define the subcommand processor functions:
-int fqprocess_view(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_count(int argc, const char *argv[], fqglobal options);
 
 
 #include "fqbuffer.h"

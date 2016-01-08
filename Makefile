@@ -7,7 +7,7 @@ BIN=.
 TEST_SRC=./tests
 TEST_BIN=./tests
 
-SUBPROCESSES=view
+SUBPROCESSES=view count
 SUBPROCESS_FILES=$(addsuffix .c, $(addprefix fqprocess_, $(SUBPROCESSES)))
 MODULES=fqbuffer.c fqfile.c fqfsin.c fqfsout.c fqfileprep.c fqparser.c fqgenerics.c fqhelp.c
 MODULE_LIST=$(addprefix $(SRC)/, $(MODULES))

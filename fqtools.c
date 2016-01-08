@@ -100,6 +100,7 @@ int main(int argc, const char *argv[]){
     
     //Farm out the individual commands to their processor functions:
     if(strcmp(command, "view") == 0) return fqprocess_view(argc, argv, options);
+    if(strcmp(command, "count") == 0) return fqprocess_count(argc, argv, options);
     //OTHER COMMANDS TO FOLLOW!
     
     //If we get to here, the given command string was invalid:

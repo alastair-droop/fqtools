@@ -49,14 +49,21 @@ void global_help(){
     printf("    u  attempt to infer format from file extension, (default .fastq.gz)\n");
     printf("\n");
     printf("COMMAND:\n");
-    printf("view      View a single FASTQ file\n");
+    printf("view      View FASTQ files\n");
+    printf("count     Count FASTQ file reads\n");
 }
 
 void fqprocess_view_usage(){
     printf("usage: %s [...] view [-hk] [-o OUTFILE] [FILE] [FILE]\n", PROG_NAME);
 }
 
+void fqprocess_count_usage(){
+    printf("usage: %s [...] count [-h] [FILE] [FILE]\n", PROG_NAME);
+}
+
 void fqprocess_view_help(){
+    printf("View FASTQ files.\n");
+    printf("\n");
     printf("view options:\n");
     printf("  -h               Show view help message and exit.\n");
     printf("  -k               Preserve secondary headers (if present).\n");
@@ -69,6 +76,17 @@ void fqprocess_view_help(){
     printf("    will be replaced with the pair number, or removed for single output\n");
     printf("    files. If the -o option is not specified, single file output will\n");
     printf("    be written to stdout and paired file output to the default stem (output%%).\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+}
+
+void fqprocess_count_help(){
+    printf("Count FASTQ file reads.\n");
+    printf("\n");
+    printf("count options:\n");
+    printf("  -h               Show view help message and exit.\n");
+    printf("  FILE             The fastq file(s) to count.\n");
     printf("\n");
     printf("FILE:\n");
     printf("    If no input file is specified, input will be read from stdin.\n");

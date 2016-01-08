@@ -7,5 +7,7 @@ void global_help();
 
 // Subcommand messages:
 void fqprocess_view_usage();
+void fqprocess_count_usage();
 void fqprocess_view_help();
+void fqprocess_count_help();
 
