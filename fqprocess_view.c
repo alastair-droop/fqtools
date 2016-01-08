@@ -6,33 +6,33 @@ fqfsout f_out;
 fqparser_callbacks callbacks;
 char interleaving_out;
 
-fqbytecount readBuffer(fqflag pair, char *b, fqbytecount b_size){
+fqbytecount fqprocess_view_readBuffer(fqflag pair, char *b, fqbytecount b_size){
     return fqfile_read(&(f_in.files[pair]->file), b, b_size);
 }
 
-void startRead(fqflag pair){
+void fqprocess_view_startRead(fqflag pair){
     fqfsout_writechar(&f_out, pair, '@');
 }
 
-void endRead(fqflag pair){
+void fqprocess_view_endRead(fqflag pair){
     if(interleaving_out == FQ_INTERLEAVED) fqfsout_flush(&f_out, pair);
 }
 
-void header1Block(fqflag pair, char *block, fqbytecount block_n, char final){
+void fqprocess_view_header1Block(fqflag pair, char *block, fqbytecount block_n, char final){
     fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-void header2Block_keep(fqflag pair, char *block, fqbytecount block_n, char final){
+void fqprocess_view_header2Block_keep(fqflag pair, char *block, fqbytecount block_n, char final){
     fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-void header2Block_discard(fqflag pair, char *block, fqbytecount block_n, char final){
+void fqprocess_view_header2Block_discard(fqflag pair, char *block, fqbytecount block_n, char final){
     if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-void sequenceBlock(fqflag pair, char *block, fqbytecount block_n, char final){
+void fqprocess_view_sequenceBlock(fqflag pair, char *block, fqbytecount block_n, char final){
     fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1){
         fqfsout_writechar(&f_out, pair, '\n');
@@ -40,12 +40,12 @@ void sequenceBlock(fqflag pair, char *block, fqbytecount block_n, char final){
     }
 }
 
-void qualityBlock(fqflag pair, char *block, fqbytecount block_n, char final){
+void fqprocess_view_qualityBlock(fqflag pair, char *block, fqbytecount block_n, char final){
     fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-int fqprocess_view(int argc, const char *argv[], fqglobal options){
+fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options){
     interleaving_out = options.output_interleaving;
     int option;
     fqstatus result;
@@ -71,14 +71,14 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
 
     //Set the callbacks:
     set_generic_callbacks(&callbacks);
-    callbacks.readBuffer = readBuffer;
-    callbacks.startRead = startRead;
-    callbacks.endRead = endRead;
-    callbacks.header1Block = header1Block;
-    callbacks.sequenceBlock = sequenceBlock;
-    if(options.keep_headers == 1) callbacks.header2Block = header2Block_keep;
-    else callbacks.header2Block = header2Block_discard;
-    callbacks.qualityBlock = qualityBlock;
+    callbacks.readBuffer = fqprocess_view_readBuffer;
+    callbacks.startRead = fqprocess_view_startRead;
+    callbacks.endRead = fqprocess_view_endRead;
+    callbacks.header1Block = fqprocess_view_header1Block;
+    callbacks.sequenceBlock = fqprocess_view_sequenceBlock;
+    if(options.keep_headers == 1) callbacks.header2Block = fqprocess_view_header2Block_keep;
+    else callbacks.header2Block = fqprocess_view_header2Block_discard;
+    callbacks.qualityBlock = fqprocess_view_qualityBlock;
 
     // Step through the input fileset:
     do finished = fqfsin_step(&f_in);
