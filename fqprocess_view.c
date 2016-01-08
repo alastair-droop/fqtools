@@ -16,6 +16,7 @@ void startRead(int user){
 }
 
 void endRead(int user){
+    if(interleaving_out == FQ_INTERLEAVED) fqfsout_flush(&f_out, user);
 }
 
 void header1Block(int user, char *block, fqbytecount block_n, char final){
@@ -46,11 +47,10 @@ void qualityBlock(int user, char *block, fqbytecount block_n, char final){
 }
 
 int fqprocess_view(int argc, const char *argv[], fqglobal options){
-    // interleaving_in = options.input_interleaving;
-    // interleaving_out = options.output_interleaving;
-    // f_number = 0;
+    interleaving_in = options.input_interleaving;
+    interleaving_out = options.output_interleaving;
     int option;
-    // fqstatus result;
+    fqstatus result;
     char finished = 0;
     //
     //Parse the subcommand options:
@@ -65,24 +65,12 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
         }
     }
 
-    prepare_filesets(&f_in, &f_out, argc - optind, &(argv[optind]), &callbacks, options);
+    result = prepare_filesets(&f_in, &f_out, argc - optind, &(argv[optind]), &callbacks, options);
+    if(result != FQ_STATUS_OK){
+        fprintf(stderr, "ERROR: failed to initialize IO\n");
+        return FQ_STATUS_FAIL;
+    }
 
-    //
-    // // Prepare the input file set:
-    // result = fqfsin_prepare(&f_in, argc - optind, &(argv[optind]), &callbacks, options);
-    // if(result != FQ_STATUS_OK){
-    //     fprintf(stderr, "ERROR: failed to initialize input\n");
-    //     return FQ_STATUS_FAIL;
-    // }
-    //
-    // // Prepare the output file set:
-    // result = fqfsout_prepare(&f_out, f_in.n_files, output_specified, options, f_in.files[0]->file.format, f_in.files[1]->file.format);
-    // if(result != FQ_STATUS_OK){
-    //     fprintf(stderr, "ERROR: failed to initialize output\n");
-    //     fqfsin_close(&f_in);
-    //     return FQ_STATUS_FAIL;
-    // }
-    //
     //Set the callbacks:
     set_generic_callbacks(&callbacks);
     callbacks.readBuffer = readBuffer;
@@ -93,11 +81,11 @@ int fqprocess_view(int argc, const char *argv[], fqglobal options){
     if(options.keep_headers == 1) callbacks.header2Block = header2Block_keep;
     else callbacks.header2Block = header2Block_discard;
     callbacks.qualityBlock = qualityBlock;
-    //
+
     // Step through the input fileset:
     do finished = fqfsin_step(&f_in);
     while(finished != 1);
-    //
+
     // // Clean up:
     fqfsin_close(&f_in);
     fqfsout_close(&f_out);
