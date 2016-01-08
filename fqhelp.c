@@ -2,7 +2,7 @@
 
 // Global messages:
 void global_version(){
-    printf("%s %s (zlib %s)\n", PROG_NAME, FQTOOLS_VERSION, ZLIB_VERSION);
+    printf("%s %s (zlib %s; htslib %s)\n", PROG_NAME, FQTOOLS_VERSION, ZLIB_VERSION, hts_version());
 }
 
 void global_usage(){
