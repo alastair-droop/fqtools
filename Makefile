@@ -3,6 +3,7 @@ CFLAGS=-Wall
 
 SRC=.
 BIN=.
+HTSDIR=./htslib
 
 TEST_SRC=./tests
 TEST_BIN=./tests
@@ -17,13 +18,13 @@ EXEC=fqtools
 .PHONY: all tests clean fqtools
 
 fqtools:
-	$(CC) $(CFLAGS) -o$(BIN)/$(EXEC) -lz $(MODULE_LIST) $(SUBPROCESS_FILES) $(SRC)/fqtools.c
+	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o$(BIN)/$(EXEC) -lz -lhts $(MODULE_LIST) $(SUBPROCESS_FILES) $(SRC)/fqtools.c
 
 tests:
-	$(CC) $(CFLAGS) -o $(TEST_BIN)/test-fqbuffer -I$(SRC) -I$(TEST_SRC) $(MODULE_LIST) -lz $(TEST_SRC)/test-fqbuffer.c
+	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o $(TEST_BIN)/test-fqbuffer -I$(SRC) -I$(TEST_SRC) $(MODULE_LIST) -lz -lhts $(TEST_SRC)/test-fqbuffer.c
 
 scratch:
-	$(CC) $(CFLAGS) -o$(BIN)/fqtest -lz $(MODULE_LIST) $(SRC)/scratch.c
+	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o$(BIN)/fqtest -lz -lhts $(MODULE_LIST) $(SRC)/scratch.c
 
 all: fqtools tests
 

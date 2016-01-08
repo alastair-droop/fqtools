@@ -1,6 +1,7 @@
+htslib/
 .DS_Store
 fqtools
 test-fqbuffer
 fqtest
 scratch.c
-./*-fastq*
+*-fastq*
