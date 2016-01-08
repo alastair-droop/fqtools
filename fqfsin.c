@@ -53,30 +53,38 @@ fqstatus fqfsin_open_paired(fqfsin *f, const char *filename_1, const char *filen
         free(f->files[1]);
         return result;
     }
-    f->files[1]->parser.user = 1;
+    f->files[1]->parser.pair = 1;
     f->n_files = 2;
     return FQ_STATUS_OK;
 }
 
 char fqfsin_step(fqfsin *f){
     char finished_1, finished_2;
-    if(f->n_files == 1) {
-        return fqparser_step(&(f->files[0]->parser));
+    int error_file, error_pair;
+    fqbytecount n1, n2;
+    finished_1 = fqparser_step(&(f->files[FQ_PAIR_1]->parser));
+    if(f->n_files == 1){
+        // SINGLE PARSER
+        if(finished_1 == FQ_PARSER_INCOMPLETE) return FQ_PARSER_INCOMPLETE;
+        if(f->files[FQ_PAIR_1]->parser.interleaved == FQ_NONINTERLEAVED) return FQ_PARSER_COMPLETE;
+        n1 = f->files[FQ_PAIR_1]->parser.n_sequences[FQ_PAIR_1];
+        n2 = f->files[FQ_PAIR_1]->parser.n_sequences[FQ_PAIR_2];
+        if(n1 == n2) return FQ_PARSER_COMPLETE;
+        error_file = FQ_PAIR_1;
+        if(n1 < n2) error_pair = FQ_PAIR_1;
+        else error_pair = FQ_PAIR_2;
     } else {
-        finished_1 = fqparser_step(&(f->files[0]->parser));
-        finished_2 = fqparser_step(&(f->files[1]->parser));
+        //Double parser
+        finished_2 = fqparser_step(&(f->files[FQ_PAIR_2]->parser));
         if(finished_1 == finished_2) return finished_1;
-        if(f->files[0]->parser.current_state == FQ_PARSER_STATE_INIT){
-            f->files[1]->parser.callbacks->error(f->files[1]->parser.user, FQ_ERROR_PAIR_MISMATCH, f->files[1]->parser.line_number, f->files[1]->parser.current_character);
-            f->files[1]->parser.error = 1;
-        } else {
-            f->files[0]->parser.callbacks->error(f->files[0]->parser.user, FQ_ERROR_PAIR_MISMATCH, f->files[0]->parser.line_number, f->files[0]->parser.current_character);
-            f->files[0]->parser.error = 1;
-        }
-        return FQ_PARSER_COMPLETE;
+        if(finished_1 == FQ_PARSER_COMPLETE) error_file = FQ_PAIR_2;
+        else error_file = FQ_PAIR_1;
+        error_pair = error_file;
     }
+    f->files[error_file]->parser.callbacks->error(error_pair, FQ_ERROR_PAIR_MISMATCH, f->files[error_file]->parser.line_number, f->files[error_file]->parser.current_character);
+    f->files[error_file]->parser.error = 1;
+    return FQ_PARSER_COMPLETE;
 }
-
 
 void fqfsin_close(fqfsin *f){
     fqpfile_close(f->files[0]);

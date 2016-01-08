@@ -1,10 +1,10 @@
 #include "fqheader.h"
 
-void fq_generic_read(int user){}
+void fq_generic_read(fqflag pair){}
 
-void fq_generic_block(int user, char *block, fqbytecount block_n, char final){}
+void fq_generic_block(fqflag pair, char *block, fqbytecount block_n, char final){}
 
-void fq_generic_error(int user, char error_type, size_t line, char character){
+void fq_generic_error(fqflag pair, char error_type, size_t line, char character){
     switch(error_type){
         case FQ_ERROR_MISSING_HEADER:
             fprintf(stderr, "ERROR [line %lu]: expected header sequence\n", line);

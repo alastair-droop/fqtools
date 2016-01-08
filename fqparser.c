@@ -1,6 +1,7 @@
 #include "fqheader.h"
 
-fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved, int user){
+fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved, fqflag pair){
+    if((pair != FQ_PAIR_1) && (pair != FQ_PAIR_2)) return FQ_STATUS_FAIL;
     p->input_buffer = (char*)malloc(in_bufsize * sizeof(char));
     if(p->input_buffer == NULL) return FQ_STATUS_FAIL;
     p->output_buffer = (char*)malloc((out_bufsize + 1) * sizeof(char));
@@ -30,7 +31,9 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
     p->output_buffer_offset = 0;
     p->output_buffer[p->output_buffer_max] = '\0';
     p->interleaved = interleaved;
-    p->user = user;
+    p->pair = pair;
+    p->n_sequences[FQ_PAIR_1] = 0;
+    p->n_sequences[FQ_PAIR_1] = 0;
     p->callbacks = callbacks;
     p->entry_point = FQ_PARSER_ENTRY_START;
     p->sequence_length = 0;
@@ -167,13 +170,13 @@ entry_start:
     while(1){
         // Get a new chunk if needed:
         if(p->input_buffer_offset == p->input_buffer_size){
-            p->input_buffer_size = p->callbacks->readBuffer(p->user, p->input_buffer, p->input_buffer_max);
+            p->input_buffer_size = p->callbacks->readBuffer(p->pair, p->input_buffer, p->input_buffer_max);
             // Check for the end of the file:
             if(p->input_buffer_size == 0){
                 // Check we're in the correct state to end:
                 if(p->current_state != FQ_PARSER_STATE_INIT){
                     //There was an error;
-                    p->callbacks->error(p->user, FQ_ERROR_INCOMPLETE_FINAL_READ, p->line_number, p->current_character);
+                    p->callbacks->error(p->pair, FQ_ERROR_INCOMPLETE_FINAL_READ, p->line_number, p->current_character);
                     p->error = 1;
                 }
                 return FQ_PARSER_COMPLETE;
@@ -197,19 +200,19 @@ entry_start:
                     if(p->current_character == '@'){
                         p->current_state = FQ_PARSER_STATE_HEADER_1;
                         p->output_buffer_offset = 0;
-                        p->callbacks->startRead(p->user);
+                        p->callbacks->startRead(p->pair);
                         p->entry_point = FQ_PARSER_ENTRY_LOOP;
                         return FQ_PARSER_INCOMPLETE;
                     }
                     if(p->current_character == '\n') break;
-                    p->callbacks->error(p->user, FQ_ERROR_MISSING_HEADER, p->line_number, p->current_character);
+                    p->callbacks->error(p->pair, FQ_ERROR_MISSING_HEADER, p->line_number, p->current_character);
                     p->entry_point = FQ_PARSER_ENTRY_DONE;
                     p->error = 1;
                     return FQ_PARSER_COMPLETE;
                 } // End of processing FQ_PARSER_STATE_INIT state.
                 case FQ_PARSER_STATE_HEADER_1:{
                     if (p->current_character == '\n'){
-                        p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_offset, 1);
+                        p->callbacks->header1Block(p->pair, p->output_buffer, p->output_buffer_offset, 1);
                         p->output_buffer_offset = 0;
                         p->current_state = FQ_PARSER_STATE_SEQUENCE;
                         p->sequence_length = 0;
@@ -219,7 +222,7 @@ entry_start:
                         p->output_buffer[p->output_buffer_offset] = p->current_character;
                         p->output_buffer_offset ++;
                         if(p->output_buffer_offset == p->output_buffer_max){
-                            p->callbacks->header1Block(p->user, p->output_buffer, p->output_buffer_offset, 0);
+                            p->callbacks->header1Block(p->pair, p->output_buffer, p->output_buffer_offset, 0);
                             p->output_buffer_offset = 0;
                             p->entry_point = FQ_PARSER_ENTRY_LOOP;
                             return FQ_PARSER_INCOMPLETE;
@@ -233,7 +236,7 @@ entry_start:
                     }
                     else {
                         if(p->valid_sequence_characters[(int)(p->current_character)] != 0){
-                            p->callbacks->error(p->user, FQ_ERROR_INVALID_SEQUENCE_CHARACTER, p->line_number, p->current_character);
+                            p->callbacks->error(p->pair, FQ_ERROR_INVALID_SEQUENCE_CHARACTER, p->line_number, p->current_character);
                             p->entry_point = FQ_PARSER_ENTRY_DONE;
                             p->error = 1;
                             return FQ_PARSER_COMPLETE;
@@ -242,7 +245,7 @@ entry_start:
                         p->output_buffer_offset ++;
                         p->sequence_length ++ ;
                         if(p->output_buffer_offset == p->output_buffer_max){
-                            p->callbacks->sequenceBlock(p->user, p->output_buffer, p->output_buffer_offset, 0);
+                            p->callbacks->sequenceBlock(p->pair, p->output_buffer, p->output_buffer_offset, 0);
                             p->output_buffer_offset = 0;
                             p->entry_point = FQ_PARSER_ENTRY_LOOP;
                             return FQ_PARSER_INCOMPLETE;
@@ -252,7 +255,7 @@ entry_start:
                 } // End of processing FQ_PARSER_STATE_SEQUENCE state.
                 case FQ_PARSER_STATE_SEQUENCE_NEWLINE:{
 					if(p->current_character == '+'){
-						p->callbacks->sequenceBlock(p->user, p->output_buffer, p->output_buffer_offset, 1);
+						p->callbacks->sequenceBlock(p->pair, p->output_buffer, p->output_buffer_offset, 1);
 						p->output_buffer_offset = 0;
 						p->current_state = FQ_PARSER_STATE_HEADER_2;
 						p->entry_point = FQ_PARSER_ENTRY_LOOP;
@@ -262,7 +265,7 @@ entry_start:
                 } // End of processing FQ_PARSER_STATE_SEQUENCE_NEWLINE state.
                 case FQ_PARSER_STATE_HEADER_2:{
 					if(p->current_character == '\n'){
-						p->callbacks->header2Block(p->user, p->output_buffer, p->output_buffer_offset, 1);
+						p->callbacks->header2Block(p->pair, p->output_buffer, p->output_buffer_offset, 1);
 						p->output_buffer_offset = 0;
 						p->current_state = FQ_PARSER_STATE_QUALITY;
 						p->quality_length = 0;
@@ -272,7 +275,7 @@ entry_start:
 						p->output_buffer[p->output_buffer_offset] = p->current_character;
 						p->output_buffer_offset ++;
 						if(p->output_buffer_offset == p->output_buffer_max){
-							p->callbacks->header2Block(p->user, p->output_buffer, p->output_buffer_offset, 0);
+							p->callbacks->header2Block(p->pair, p->output_buffer, p->output_buffer_offset, 0);
 							p->output_buffer_offset = 0;
 							p->entry_point = FQ_PARSER_ENTRY_LOOP;
 							return FQ_PARSER_INCOMPLETE;
@@ -285,28 +288,29 @@ entry_start:
 						p->output_buffer[p->output_buffer_offset] = p->current_character;
 						p->output_buffer_offset ++;
                         if(p->valid_quality_characters[(int)(p->current_character)] != 0){
-                            p->callbacks->error(p->user, FQ_ERROR_INVALID_QUALITY_CHARACTER, p->line_number, p->current_character);
+                            p->callbacks->error(p->pair, FQ_ERROR_INVALID_QUALITY_CHARACTER, p->line_number, p->current_character);
                             p->entry_point = FQ_PARSER_ENTRY_DONE;
                             p->error = 1;
                             return FQ_PARSER_COMPLETE;
                         }
 						p->quality_length ++;
 						if(p->output_buffer_offset == p->output_buffer_max){
-							p->callbacks->qualityBlock(p->user, p->output_buffer, p->output_buffer_offset, 0);
+							p->callbacks->qualityBlock(p->pair, p->output_buffer, p->output_buffer_offset, 0);
 							p->output_buffer_offset = 0;
 							p->entry_point = FQ_PARSER_ENTRY_LOOP;
 							return FQ_PARSER_INCOMPLETE;
 						}
 					}
 					if(p->quality_length == p->sequence_length){
-						p->callbacks->qualityBlock(p->user, p->output_buffer, p->output_buffer_offset, 1);
+						p->callbacks->qualityBlock(p->pair, p->output_buffer, p->output_buffer_offset, 1);
 						p->entry_point = FQ_PARSER_ENTRY_QUALITY;
 						return FQ_PARSER_INCOMPLETE;
 entry_quality:
 						p->output_buffer_offset = 0;
 						p->current_state = FQ_PARSER_STATE_INIT;
-						p->callbacks->endRead(p->user);
-                        if(p->interleaved == FQ_INTERLEAVED) p->user = !(p->user);
+						p->callbacks->endRead(p->pair);
+                        p->n_sequences[(int)(p->pair)] ++;
+                        if(p->interleaved == FQ_INTERLEAVED) p->pair = !(p->pair);
 						p->entry_point = FQ_PARSER_ENTRY_LOOP;
 						return FQ_PARSER_INCOMPLETE;
 					}

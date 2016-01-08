@@ -32,14 +32,14 @@
 //Define the parser callback struct:
 typedef struct {
     char interrupt;
-    void (*startRead)(int user);
-    void (*endRead)(int user);
-    void (*header1Block)(int user, char *block, fqbytecount block_n, char final);
-    void (*header2Block)(int user, char *block, fqbytecount block_n, char final);
-    void (*sequenceBlock)(int user, char *block, fqbytecount block_n, char final);
-    void (*qualityBlock)(int user, char *block, fqbytecount block_n, char final);
-    void (*error)(int user, char error_type, size_t line, char character);
-    fqbytecount (*readBuffer)(int user, char *b, fqbytecount b_size);
+    void (*startRead)(fqflag pair);
+    void (*endRead)(fqflag pair);
+    void (*header1Block)(fqflag pair, char *block, fqbytecount block_n, char final);
+    void (*header2Block)(fqflag pair, char *block, fqbytecount block_n, char final);
+    void (*sequenceBlock)(fqflag pair, char *block, fqbytecount block_n, char final);
+    void (*qualityBlock)(fqflag pair, char *block, fqbytecount block_n, char final);
+    void (*error)(fqflag pair, char error_type, size_t line, char character);
+    fqbytecount (*readBuffer)(fqflag pair, char *b, fqbytecount b_size);
 } fqparser_callbacks;
 
 typedef struct {
@@ -55,10 +55,11 @@ typedef struct {
     fqparser_callbacks *callbacks;
     // Permanent state:
     fqflag interleaved;
-    int user;
+    char pair;
     char *valid_sequence_characters;
     char *valid_quality_characters;
     // Temporary state:
+    fqbytecount n_sequences[2];
     fqbytecount sequence_length;
     fqbytecount quality_length;
     char entry_point;
@@ -68,7 +69,7 @@ typedef struct {
     fqbytecount line_number;
 } fqparser;
 
-fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved, int user);
+fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount in_bufsize, fqbytecount out_bufsize, fqflag seq_flags, fqflag encoding, fqflag interleaved, fqflag pair);
 void fqparser_free(fqparser *p);
 
 void fqparser_setValidSequenceCharacters(fqparser *p, fqflag flags);

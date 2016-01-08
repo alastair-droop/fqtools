@@ -6,43 +6,43 @@ fqfsout f_out;
 fqparser_callbacks callbacks;
 char interleaving_out;
 
-fqbytecount readBuffer(int user, char *b, fqbytecount b_size){
-    return fqfile_read(&(f_in.files[user]->file), b, b_size);
+fqbytecount readBuffer(fqflag pair, char *b, fqbytecount b_size){
+    return fqfile_read(&(f_in.files[pair]->file), b, b_size);
 }
 
-void startRead(int user){
-    fqfsout_writechar(&f_out, user, '@');
+void startRead(fqflag pair){
+    fqfsout_writechar(&f_out, pair, '@');
 }
 
-void endRead(int user){
-    if(interleaving_out == FQ_INTERLEAVED) fqfsout_flush(&f_out, user);
+void endRead(fqflag pair){
+    if(interleaving_out == FQ_INTERLEAVED) fqfsout_flush(&f_out, pair);
 }
 
-void header1Block(int user, char *block, fqbytecount block_n, char final){
-    fqfsout_write(&f_out, user, block, block_n);
-    if(final == 1) fqfsout_writechar(&f_out, user, '\n');
+void header1Block(fqflag pair, char *block, fqbytecount block_n, char final){
+    fqfsout_write(&f_out, pair, block, block_n);
+    if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-void header2Block_keep(int user, char *block, fqbytecount block_n, char final){
-    fqfsout_write(&f_out, user, block, block_n);
-    if(final == 1) fqfsout_writechar(&f_out, user, '\n');
+void header2Block_keep(fqflag pair, char *block, fqbytecount block_n, char final){
+    fqfsout_write(&f_out, pair, block, block_n);
+    if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-void header2Block_discard(int user, char *block, fqbytecount block_n, char final){
-    if(final == 1) fqfsout_writechar(&f_out, user, '\n');
+void header2Block_discard(fqflag pair, char *block, fqbytecount block_n, char final){
+    if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
-void sequenceBlock(int user, char *block, fqbytecount block_n, char final){
-    fqfsout_write(&f_out, user, block, block_n);
+void sequenceBlock(fqflag pair, char *block, fqbytecount block_n, char final){
+    fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1){
-        fqfsout_writechar(&f_out, user, '\n');
-        fqfsout_writechar(&f_out, user, '+');
+        fqfsout_writechar(&f_out, pair, '\n');
+        fqfsout_writechar(&f_out, pair, '+');
     }
 }
 
-void qualityBlock(int user, char *block, fqbytecount block_n, char final){
-    fqfsout_write(&f_out, user, block, block_n);
-    if(final == 1) fqfsout_writechar(&f_out, user, '\n');
+void qualityBlock(fqflag pair, char *block, fqbytecount block_n, char final){
+    fqfsout_write(&f_out, pair, block, block_n);
+    if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
 }
 
 int fqprocess_view(int argc, const char *argv[], fqglobal options){
