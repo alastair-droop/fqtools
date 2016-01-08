@@ -66,20 +66,6 @@ fqstatus fqfsout_open_single(fqfsout *f, const char *filename, fqflag format, fq
     return FQ_STATUS_OK;
 }
 
-// fqstatus fqfsout_open_single(fqfsout *f, const char *filename, fqflag format, fqbytecount b_size){
-//     fqstatus result;
-//     f->files[0] = malloc(sizeof(fqbfile));
-//     if(f->files[0] == NULL) return FQ_STATUS_FAIL;
-//     result = fqbfile_open(f->files[0], filename, format, b_size);
-//     if(result != FQ_STATUS_OK){
-//         free(f->files[0]);
-//         return result;
-//     }
-//     f->files[1] = f->files[0];
-//     f->n_files = 1;
-//     return FQ_STATUS_OK;
-// }
-
 fqstatus fqfsout_open_paired(fqfsout *f, const char *filename_1, const char *filename_2, fqflag format_1, fqflag format_2, fqbytecount b_size){
     fqstatus result;
     f->files[0] = malloc(sizeof(fqbfile));

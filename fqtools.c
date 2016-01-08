@@ -55,6 +55,7 @@ int main(int argc, const char *argv[]){
     options.quality = FQ_QTYPE_UNKNOWN;
     options.input_format = FQ_FORMAT_UNKNOWN;
     options.output_format = FQ_FORMAT_UNKNOWN;
+    options.output_fasta = 0;
     options.default_input_format = FQ_FORMAT_FASTQ_GZ;
     options.default_output_format = FQ_FORMAT_FASTQ_GZ;
     options.input_interleaving = FQ_NONINTERLEAVED;
@@ -101,7 +102,7 @@ int main(int argc, const char *argv[]){
     //Farm out the individual commands to their processor functions:
     if(strcmp(command, "view") == 0) return fqprocess_view(argc, argv, options);
     if(strcmp(command, "count") == 0) return fqprocess_count(argc, argv, options);
-    //OTHER COMMANDS TO FOLLOW!
+    if(strcmp(command, "fasta") == 0) return fqprocess_fasta(argc, argv, options);
     
     //If we get to here, the given command string was invalid:
     fprintf(stderr, "ERROR: unknown command: \"%s\"\n", command);

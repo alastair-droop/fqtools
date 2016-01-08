@@ -43,6 +43,8 @@ typedef unsigned char fqstatus;
 #define FQ_FORMAT_FASTQ 1
 #define FQ_FORMAT_FASTQ_GZ 2
 #define FQ_FORMAT_BAM 3
+#define FQ_FORMAT_FASTA 4
+#define FQ_FORMAT_FASTA_GZ 5
 
 // Define the file set types:
 #define FQ_UNPAIRED 0
@@ -69,6 +71,7 @@ typedef struct {
     fqflag default_output_format;
     fqflag input_interleaving;
     fqflag output_interleaving;
+    char output_fasta;
     char keep_headers;
     char output_filename_specified;
     char file_pair_replacement;
@@ -78,7 +81,7 @@ typedef struct {
 // Define the subcommand processor functions:
 fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_count(int argc, const char *argv[], fqglobal options);
-
+fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options);
 
 #include "fqbuffer.h"
 #include "fqfile.h"

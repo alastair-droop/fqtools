@@ -43,12 +43,21 @@ fqstatus prepare_filesets(fqfsin *in, fqfsout *out, int n_infiles, const char *i
         if((n_outfiles == 1) && (options.output_filename_specified == 0)){
             outformat_1 = options.output_format;
             if(outformat_1 == FQ_FORMAT_UNKNOWN) outformat_1 = informat_1;
+            //At this point, modify FASTQ that should be FASTA:
+            if(options.output_fasta == 1){
+                if(outformat_1 == FQ_FORMAT_FASTQ) outformat_1 = FQ_FORMAT_FASTA;
+                if(outformat_1 == FQ_FORMAT_FASTQ_GZ) outformat_1 = FQ_FORMAT_FASTA_GZ;
+            }
             result = fqfsout_open_single(out, NULL, outformat_1, options.output_bufsize);
             if(result != FQ_STATUS_OK) {fqfsin_close(in); goto finish;}        
         }
         if((n_outfiles == 1) && (options.output_filename_specified == 1)){
             outformat_1 = options.output_format;
             if(outformat_1 == FQ_FORMAT_UNKNOWN) outformat_1 = informat_1;
+            if(options.output_fasta == 1){
+                if(outformat_1 == FQ_FORMAT_FASTQ) outformat_1 = FQ_FORMAT_FASTA;
+                if(outformat_1 == FQ_FORMAT_FASTQ_GZ) outformat_1 = FQ_FORMAT_FASTA_GZ;
+            }
             outfile_1 = generate_filename(options.file_output_stem, options.file_pair_replacement, 0, outformat_1);
             result = fqfsout_open_single(out, outfile_1, outformat_1, options.output_bufsize);
             if(result != FQ_STATUS_OK) {fqfsin_close(in); goto finish;}
@@ -59,6 +68,12 @@ fqstatus prepare_filesets(fqfsin *in, fqfsout *out, int n_infiles, const char *i
             outformat_2 = options.output_format;
             if(outformat_2 == FQ_FORMAT_UNKNOWN) outformat_2 = informat_2;
             if((outformat_2 == FQ_FORMAT_UNKNOWN) && (options.input_interleaving == FQ_INTERLEAVED)) outformat_2 = informat_1;
+            if(options.output_fasta == 1){
+                if(outformat_1 == FQ_FORMAT_FASTQ) outformat_1 = FQ_FORMAT_FASTA;
+                if(outformat_1 == FQ_FORMAT_FASTQ_GZ) outformat_1 = FQ_FORMAT_FASTA_GZ;
+                if(outformat_2 == FQ_FORMAT_FASTQ) outformat_2 = FQ_FORMAT_FASTA;
+                if(outformat_2 == FQ_FORMAT_FASTQ_GZ) outformat_2 = FQ_FORMAT_FASTA_GZ;
+            }
             outfile_1 = generate_filename(options.file_output_stem, options.file_pair_replacement, 1, outformat_1);
             outfile_2 = generate_filename(options.file_output_stem, options.file_pair_replacement, 2, outformat_2);
             result = fqfsout_open_paired(out, outfile_1, outfile_2, outformat_1, outformat_2, options.output_bufsize);
