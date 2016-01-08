@@ -14,6 +14,10 @@ void fqprocess_fasta_startRead(fqflag pair){
     fqfsout_writechar(&f_out, pair, '>');
 }
 
+void fqprocess_fasta_endRead(fqflag pair){
+    if(interleaving_out == FQ_INTERLEAVED) fqfsout_flush(&f_out, pair);
+}
+
 void fqprocess_fasta_header1Block(fqflag pair, char *block, fqbytecount block_n, char final){
     fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1) fqfsout_writechar(&f_out, pair, '\n');
@@ -56,6 +60,7 @@ fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options){
     set_generic_callbacks(&callbacks);
     callbacks.readBuffer = fqprocess_fasta_readBuffer;
     callbacks.startRead = fqprocess_fasta_startRead;
+    callbacks.endRead = fqprocess_fasta_endRead;
     callbacks.header1Block = fqprocess_fasta_header1Block;
     callbacks.sequenceBlock = fqprocess_fasta_sequenceBlock;
 
