@@ -105,6 +105,7 @@ int main(int argc, const char *argv[]){
     if(strcmp(command, "count") == 0) return fqprocess_count(argc, argv, options);
     if(strcmp(command, "fasta") == 0) return fqprocess_fasta(argc, argv, options);
     if(strcmp(command, "basetab") == 0) return fqprocess_basetab(argc, argv, options);
+    if(strcmp(command, "qualtab") == 0) return fqprocess_qualtab(argc, argv, options);
     if(strcmp(command, "type") == 0) return fqprocess_type(argc, argv, options);
     
     //If we get to here, the given command string was invalid:

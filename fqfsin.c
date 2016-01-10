@@ -67,6 +67,7 @@ char fqfsin_step(fqfsin *f){
     f->status = FQ_STATUS_OK;
     finished_1 = fqparser_step(&(f->files[FQ_PAIR_1]->parser));
     if(f->n_files == 1){
+        f->status = f->files[FQ_PAIR_1]->parser.error;
         // SINGLE PARSER
         if(finished_1 == FQ_PARSER_INCOMPLETE) return FQ_PARSER_INCOMPLETE;
         if(f->files[FQ_PAIR_1]->parser.interleaved == FQ_NONINTERLEAVED) return FQ_PARSER_COMPLETE;
@@ -79,6 +80,7 @@ char fqfsin_step(fqfsin *f){
     } else {
         //Double parser
         finished_2 = fqparser_step(&(f->files[FQ_PAIR_2]->parser));
+        f->status = f->files[FQ_PAIR_1]->parser.error | f->files[FQ_PAIR_2]->parser.error;
         if(finished_1 == finished_2) return finished_1;
         if(finished_1 == FQ_PARSER_COMPLETE) error_file = FQ_PAIR_2;
         else error_file = FQ_PAIR_1;

@@ -86,6 +86,7 @@ fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_count(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_basetab(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_qualtab(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_type(int argc, const char *argv[], fqglobal options);
 
 #include "fqbuffer.h"
