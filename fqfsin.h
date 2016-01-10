@@ -10,6 +10,7 @@ void fqpfile_close(fqpfile *f);
 
 typedef struct{
     char n_files;
+    fqflag interleaved;
     fqflag status;
     fqpfile *files[2];
 } fqfsin;
