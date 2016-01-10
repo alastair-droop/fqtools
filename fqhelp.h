@@ -9,8 +9,10 @@ void global_help();
 void fqprocess_view_usage();
 void fqprocess_count_usage();
 void fqprocess_fasta_usage();
+void fqprocess_basetab_usage();
 
 void fqprocess_view_help();
 void fqprocess_count_help();
 void fqprocess_fasta_help();
+void fqprocess_basetab_help();
 

@@ -52,6 +52,7 @@ void global_help(){
     printf("view      View FASTQ files\n");
     printf("count     Count FASTQ file reads\n");
     printf("fasta     Convert FASTQ files to FASTA format\n");
+    printf("basetab   Tabulate FASTQ base frequencies\n");
 }
 
 void fqprocess_view_usage(){
@@ -64,6 +65,10 @@ void fqprocess_count_usage(){
 
 void fqprocess_fasta_usage(){
     printf("usage: %s [...] fasta [-h] [-l LENGTH] [-o OUTFILE] [FILE] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_basetab_usage(){
+    printf("usage: %s [...] basetab [-has] [FILE] [FILE]\n", PROG_NAME);
 }
 
 void fqprocess_view_help(){
@@ -117,6 +122,19 @@ void fqprocess_fasta_help(){
     printf("    will be replaced with the pair number, or removed for single output\n");
     printf("    files. If the -o option is not specified, single file output will\n");
     printf("    be written to stdout and paired file output to the default stem (output%%).\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+}
+
+void fqprocess_basetab_help(){
+    printf("Tabulate FASTQ base frequencies.\n");
+    printf("\n");
+    printf("basetab options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  -a               Show all valid base frequencies, even if zero.\n");
+    printf("  -s               Sort returned base frequencies (otherwise alphabetical).\n");
+    printf("  FILE             The fastq file(s) to count.\n");
     printf("\n");
     printf("FILE:\n");
     printf("    If no input file is specified, input will be read from stdin.\n");
