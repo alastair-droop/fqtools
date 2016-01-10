@@ -104,6 +104,10 @@ int main(int argc, const char *argv[]){
     if(strcmp(command, "view") == 0) return fqprocess_view(argc, argv, options);
     if(strcmp(command, "head") == 0) return fqprocess_head(argc, argv, options);
     if(strcmp(command, "count") == 0) return fqprocess_count(argc, argv, options);
+	if(strcmp(command, "header") == 0) return fqprocess_blockview(argc, argv, options, 0);
+	if(strcmp(command, "sequence") == 0) return fqprocess_blockview(argc, argv, options, 1);
+	if(strcmp(command, "quality") == 0) return fqprocess_blockview(argc, argv, options, 2);
+	if(strcmp(command, "header2") == 0) return fqprocess_blockview(argc, argv, options, 3);
     if(strcmp(command, "fasta") == 0) return fqprocess_fasta(argc, argv, options);
     if(strcmp(command, "basetab") == 0) return fqprocess_basetab(argc, argv, options);
     if(strcmp(command, "qualtab") == 0) return fqprocess_qualtab(argc, argv, options);

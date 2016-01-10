@@ -85,6 +85,7 @@ typedef struct {
 fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_head(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_count(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_blockview(int argc, const char *argv[], fqglobal options, char blockview);
 fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_basetab(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_qualtab(int argc, const char *argv[], fqglobal options);

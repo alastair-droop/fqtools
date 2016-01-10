@@ -52,6 +52,10 @@ void global_help(){
     printf("view      View FASTQ files\n");
     printf("head      View the first reads in FASTQ files\n");
     printf("count     Count FASTQ file reads\n");
+    printf("header    View FASTQ file header data\n");
+    printf("sequence  View FASTQ file sequence data\n");
+    printf("quality   View FASTQ file quality data\n");
+    printf("header2   View FASTQ file secondary header data\n");
     printf("fasta     Convert FASTQ files to FASTA format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
     printf("qualtab   Tabulate FASTQ quality character frequencies\n");
@@ -68,6 +72,10 @@ void fqprocess_head_usage(){
 
 void fqprocess_count_usage(){
     printf("usage: %s [...] count [-h] [FILE] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_blockview_usage(char *command_str){
+    printf("usage: %s [...] %s [-h] [FILE] [FILE]\n", PROG_NAME, command_str);
 }
 
 void fqprocess_fasta_usage(){
@@ -136,6 +144,17 @@ void fqprocess_count_help(){
     printf("count options:\n");
     printf("  -h               Show this help message and exit.\n");
     printf("  FILE             The fastq file(s) to count.\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+}
+
+void fqprocess_blockview_help(char *command_str){
+    printf("View FASTQ file %s data.\n", command_str);
+    printf("\n");
+    printf("%s options:\n", command_str);
+    printf("  -h               Show this help message and exit.\n");
+    printf("  FILE             The fastq file(s) to view.\n");
     printf("\n");
     printf("FILE:\n");
     printf("    If no input file is specified, input will be read from stdin.\n");
