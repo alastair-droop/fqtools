@@ -53,6 +53,7 @@ int main(int argc, const char *argv[]){
     options.output_bufsize = 1048576;
     options.sequence_flags = 0;
     options.quality = FQ_QTYPE_UNKNOWN;
+    options.single_input = 0;
     options.input_format = FQ_FORMAT_UNKNOWN;
     options.output_format = FQ_FORMAT_UNKNOWN;
     options.output_fasta = 0;
@@ -104,6 +105,7 @@ int main(int argc, const char *argv[]){
     if(strcmp(command, "count") == 0) return fqprocess_count(argc, argv, options);
     if(strcmp(command, "fasta") == 0) return fqprocess_fasta(argc, argv, options);
     if(strcmp(command, "basetab") == 0) return fqprocess_basetab(argc, argv, options);
+    if(strcmp(command, "type") == 0) return fqprocess_type(argc, argv, options);
     
     //If we get to here, the given command string was invalid:
     fprintf(stderr, "ERROR: unknown command: \"%s\"\n", command);

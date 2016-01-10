@@ -53,6 +53,7 @@ void global_help(){
     printf("count     Count FASTQ file reads\n");
     printf("fasta     Convert FASTQ files to FASTA format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
+    printf("type      Attempt to guess the FASTQ quality encoding type\n");    
 }
 
 void fqprocess_view_usage(){
@@ -69,6 +70,10 @@ void fqprocess_fasta_usage(){
 
 void fqprocess_basetab_usage(){
     printf("usage: %s [...] basetab [-has] [FILE] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_type_usage(){
+    printf("usage: %s [...] type [-h] [FILE]\n", PROG_NAME);
 }
 
 void fqprocess_view_help(){
@@ -138,4 +143,20 @@ void fqprocess_basetab_help(){
     printf("\n");
     printf("FILE:\n");
     printf("    If no input file is specified, input will be read from stdin.\n");
+}
+
+void fqprocess_type_help(){
+    printf("Attempt to guess the FASTQ quality encoding type.\n");
+    printf("\n");
+    printf("type options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  FILE             The fastq file(s) to count.\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+    printf("\n");
+    printf("The file type is guessed from the quality data as follows:\n");
+    printf("  1) if MIN(offset) < 59 then the file is fastq-sanger encoded;\n");
+    printf("  2) if 59 <= MIN(offset) < 64 then the file is fastq-solexa encoded;\n");
+    printf("  3) otherwise, the file is fastq-illumina encoded.\n");
 }

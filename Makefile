@@ -8,7 +8,7 @@ HTSDIR=./htslib
 TEST_SRC=./tests
 TEST_BIN=./tests
 
-SUBPROCESSES=view count fasta basetab
+SUBPROCESSES=view count fasta basetab type
 SUBPROCESS_FILES=$(addsuffix .c, $(addprefix fqprocess_, $(SUBPROCESSES)))
 MODULES=fqbuffer.c fqfile.c fqfsin.c fqfsout.c fqfileprep.c fqparser.c fqgenerics.c fqhelp.c
 MODULE_LIST=$(addprefix $(SRC)/, $(MODULES))

@@ -67,6 +67,7 @@ typedef struct {
     fqbytecount output_bufsize;
     fqflag sequence_flags;
     fqflag quality;
+    char single_input;
     fqflag input_format;
     fqflag output_format;
     fqflag default_input_format;
@@ -85,6 +86,7 @@ fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_count(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_basetab(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_type(int argc, const char *argv[], fqglobal options);
 
 #include "fqbuffer.h"
 #include "fqfile.h"

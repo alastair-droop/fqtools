@@ -8,6 +8,7 @@ fqstatus prepare_filesets(fqfsin *in, fqfsout *out, int n_infiles, const char *i
     fqflag outformat_1, outformat_2;
     int n_outfiles;
     //INPUT:
+    if((n_infiles == 2) && (options.single_input == 1)) return FQ_STATUS_FAIL;    
     if((n_infiles == 2) && (options.input_interleaving == FQ_INTERLEAVED)) options.input_interleaving = FQ_NONINTERLEAVED; // Ignore interleaving for 2 input files
     if(n_infiles == 0){
         informat_1 = options.input_format;
