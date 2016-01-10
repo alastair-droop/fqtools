@@ -230,6 +230,16 @@ entry_start:
                     }
 					break;
                 } // End of processing FQ_PARSER_STATE_HEADER_1 state.
+                case FQ_PARSER_STATE_SEQUENCE_NEWLINE:{
+					if(p->current_character == '+'){
+						p->callbacks->sequenceBlock(p->pair, p->output_buffer, p->output_buffer_offset, 1);
+						p->output_buffer_offset = 0;
+						p->current_state = FQ_PARSER_STATE_HEADER_2;
+						p->entry_point = FQ_PARSER_ENTRY_LOOP;
+						return FQ_PARSER_INCOMPLETE;
+					}
+					else p->current_state = FQ_PARSER_STATE_SEQUENCE;
+                } // End of processing FQ_PARSER_STATE_SEQUENCE_NEWLINE state.
                 case FQ_PARSER_STATE_SEQUENCE:{
                     if(p->current_character == '\n'){
                         p->current_state = FQ_PARSER_STATE_SEQUENCE_NEWLINE;
@@ -253,16 +263,6 @@ entry_start:
                     }
                     break;
                 } // End of processing FQ_PARSER_STATE_SEQUENCE state.
-                case FQ_PARSER_STATE_SEQUENCE_NEWLINE:{
-					if(p->current_character == '+'){
-						p->callbacks->sequenceBlock(p->pair, p->output_buffer, p->output_buffer_offset, 1);
-						p->output_buffer_offset = 0;
-						p->current_state = FQ_PARSER_STATE_HEADER_2;
-						p->entry_point = FQ_PARSER_ENTRY_LOOP;
-						return FQ_PARSER_INCOMPLETE;
-					}
-					else p->current_state = FQ_PARSER_STATE_SEQUENCE;
-                } // End of processing FQ_PARSER_STATE_SEQUENCE_NEWLINE state.
                 case FQ_PARSER_STATE_HEADER_2:{
 					if(p->current_character == '\n'){
 						p->callbacks->header2Block(p->pair, p->output_buffer, p->output_buffer_offset, 1);

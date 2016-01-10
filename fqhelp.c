@@ -59,7 +59,8 @@ void global_help(){
     printf("fasta     Convert FASTQ files to FASTA format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
     printf("qualtab   Tabulate FASTQ quality character frequencies\n");
-    printf("type      Attempt to guess the FASTQ quality encoding type\n");    
+    printf("type      Attempt to guess the FASTQ quality encoding type\n");
+    printf("validate  Validate FASTQ files\n");
 }
 
 void fqprocess_view_usage(){
@@ -92,6 +93,10 @@ void fqprocess_qualtab_usage(){
 
 void fqprocess_type_usage(){
     printf("usage: %s [...] type [-h] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_validate_usage(){
+    printf("usage: %s [...] validate [-h] [FILE] [FILE]\n", PROG_NAME);
 }
 
 void fqprocess_view_help(){
@@ -228,4 +233,15 @@ void fqprocess_type_help(){
     printf("  1) if MIN(offset) < 59 then the file is fastq-sanger encoded;\n");
     printf("  2) if 59 <= MIN(offset) < 64 then the file is fastq-solexa encoded;\n");
     printf("  3) otherwise, the file is fastq-illumina encoded.\n");
+}
+
+void fqprocess_validate_help(){
+    printf("Validate FASTQ file.\n");
+    printf("\n");
+    printf("validate options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  FILE             The fastq file(s) to count.\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
 }
