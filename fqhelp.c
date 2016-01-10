@@ -61,6 +61,7 @@ void global_help(){
     printf("qualtab   Tabulate FASTQ quality character frequencies\n");
     printf("type      Attempt to guess the FASTQ quality encoding type\n");
     printf("validate  Validate FASTQ files\n");
+    printf("find      Find FASTQ reads containing specific sequences\n");
 }
 
 void fqprocess_view_usage(){
@@ -97,6 +98,14 @@ void fqprocess_type_usage(){
 
 void fqprocess_validate_usage(){
     printf("usage: %s [...] validate [-h] [FILE] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_find_usage(){
+    printf("usage: %s [...] find [-hka] [-o OUTFILE]  [-s SEQUENCE ...] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_trim_usage(){
+    printf("TODO\n");
 }
 
 void fqprocess_view_help(){
@@ -245,3 +254,36 @@ void fqprocess_validate_help(){
     printf("FILE:\n");
     printf("    If no input file is specified, input will be read from stdin.\n");
 }
+
+void fqprocess_find_help(){
+    printf("Find FASTQ reads containing specific sequences.\n");
+    printf("\n");
+    printf("view options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  -k               Preserve secondary headers (if present).\n");
+    printf("  -a               Require all sequences for a match.\n");
+    printf("  -s SEQUENCE      Sequence to match against.\n");
+    printf("  -o STEM          Output file stem (default \"output%%\").\n");
+    printf("  FILE             The fastq file(s) to view.\n");
+    printf("\n");
+    printf("SEQUENCE:\n");
+    printf("    An exact sequence to look for in the read. Multiple sequences are\n");
+    printf("    permitted. If -a is specified, all specified sequences must be present\n");
+    printf("    for a read to match, otherwise the presence of any one is sufficient.\n");
+    printf("    If no sequences are specified, all reads are returned.\n");
+    printf("\n");
+    printf("STEM:\n");
+    printf("    The file stem to use for output files (without file extension). Any\n");
+    printf("    instances of the single character specified using the -p global argument\n");
+    printf("    will be replaced with the pair number, or removed for single output\n");
+    printf("    files. If the -o option is not specified, single file output will\n");
+    printf("    be written to stdout and paired file output to the default stem (output%%).\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+}
+
+void fqprocess_trim_help(){
+    printf("TODO\n");
+}
+

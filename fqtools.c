@@ -113,6 +113,7 @@ int main(int argc, const char *argv[]){
     if(strcmp(command, "qualtab") == 0) return fqprocess_qualtab(argc, argv, options);
     if(strcmp(command, "type") == 0) return fqprocess_type(argc, argv, options);
     if(strcmp(command, "validate") == 0) return fqprocess_validate(argc, argv, options);
+    if(strcmp(command, "find") == 0) return fqprocess_find(argc, argv, options);
     
     //If we get to here, the given command string was invalid:
     fprintf(stderr, "ERROR: unknown command: \"%s\"\n", command);
