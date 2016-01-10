@@ -3,7 +3,6 @@
 
 // Define the global variables:
 fqfsin f_in;
-fqfsout f_out;
 fqparser_callbacks callbacks;
 fqbytecount counts[94];
 
@@ -41,7 +40,7 @@ fqstatus fqprocess_qualtab(int argc, const char *argv[], fqglobal options){
     }
 
     //Prepare the IO file sets:
-    result = prepare_filesets(&f_in, &f_out, argc - optind, &(argv[optind]), &callbacks, options);
+    result = prepare_filesets(&f_in, NULL, argc - optind, &(argv[optind]), &callbacks, options);
     if(result != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: failed to initialize IO\n");
         return FQ_STATUS_FAIL;
@@ -70,6 +69,5 @@ fqstatus fqprocess_qualtab(int argc, const char *argv[], fqglobal options){
     
     // Clean up:
     fqfsin_close(&f_in);
-    fqfsout_close(&f_out);
     return result;
 }
