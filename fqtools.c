@@ -102,6 +102,7 @@ int main(int argc, const char *argv[]){
     
     //Farm out the individual commands to their processor functions:
     if(strcmp(command, "view") == 0) return fqprocess_view(argc, argv, options);
+    if(strcmp(command, "head") == 0) return fqprocess_head(argc, argv, options);
     if(strcmp(command, "count") == 0) return fqprocess_count(argc, argv, options);
     if(strcmp(command, "fasta") == 0) return fqprocess_fasta(argc, argv, options);
     if(strcmp(command, "basetab") == 0) return fqprocess_basetab(argc, argv, options);

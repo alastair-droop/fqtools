@@ -50,6 +50,7 @@ void global_help(){
     printf("\n");
     printf("COMMAND:\n");
     printf("view      View FASTQ files\n");
+    printf("head      View the first reads in FASTQ files");
     printf("count     Count FASTQ file reads\n");
     printf("fasta     Convert FASTQ files to FASTA format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
@@ -59,6 +60,10 @@ void global_help(){
 
 void fqprocess_view_usage(){
     printf("usage: %s [...] view [-hk] [-o OUTFILE] [FILE] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_head_usage(){
+    printf("usage: %s [...] head [-hk] [-n NUMBER] [-o OUTFILE] [FILE] [FILE]\n", PROG_NAME);
 }
 
 void fqprocess_count_usage(){
@@ -89,6 +94,30 @@ void fqprocess_view_help(){
     printf("  -k               Preserve secondary headers (if present).\n");
     printf("  -o STEM          Output file stem (default \"output%%\").\n");
     printf("  FILE             The fastq file(s) to view.\n");
+    printf("\n");
+    printf("STEM:\n");
+    printf("    The file stem to use for output files (without file extension). Any\n");
+    printf("    instances of the single character specified using the -p global argument\n");
+    printf("    will be replaced with the pair number, or removed for single output\n");
+    printf("    files. If the -o option is not specified, single file output will\n");
+    printf("    be written to stdout and paired file output to the default stem (output%%).\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+}
+
+void fqprocess_head_help(){
+    printf("View the first reads in FASTQ files.\n");
+    printf("\n");
+    printf("view options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  -k               Preserve secondary headers (if present).\n");
+    printf("  -n NUMBER        The number of reads to display (default 10).\n");
+    printf("  -o STEM          Output file stem (default \"output%%\").\n");
+    printf("  FILE             The fastq file(s) to view.\n");
+    printf("\n");
+    printf("NUMBER:\n");
+    printf("    The number of reads to return from the top of the file(s).\n");
     printf("\n");
     printf("STEM:\n");
     printf("    The file stem to use for output files (without file extension). Any\n");

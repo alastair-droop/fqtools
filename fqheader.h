@@ -83,6 +83,7 @@ typedef struct {
 
 // Define the subcommand processor functions:
 fqstatus fqprocess_view(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_head(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_count(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_basetab(int argc, const char *argv[], fqglobal options);
