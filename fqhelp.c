@@ -50,11 +50,11 @@ void global_help(){
     printf("\n");
     printf("COMMAND:\n");
     printf("view      View FASTQ files\n");
-    printf("head      View the first reads in FASTQ files");
+    printf("head      View the first reads in FASTQ files\n");
     printf("count     Count FASTQ file reads\n");
     printf("fasta     Convert FASTQ files to FASTA format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
-    printf("qualtab   Tabulate FASTQ quality character frequencies");
+    printf("qualtab   Tabulate FASTQ quality character frequencies\n");
     printf("type      Attempt to guess the FASTQ quality encoding type\n");    
 }
 
