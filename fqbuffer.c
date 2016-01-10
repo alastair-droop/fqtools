@@ -22,6 +22,7 @@ void fqbuffer_free(fqbuffer *b){
 // setting the offset to the start:
 void fqbuffer_reset(fqbuffer *b){
     // memset(b->data, 0, (size_t)(b->size));
+    b->data[0] = '\0';
     b->offset = 0;
 }
 
