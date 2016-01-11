@@ -5,6 +5,7 @@ fqfsin f_in;
 fqfsout f_out;
 fqparser_callbacks callbacks;
 char interleaving_out;
+fqbytecount line_length, current_line;
 
 fqbytecount fqprocess_fasta_readBuffer(fqflag pair, char *b, fqbytecount b_size){
     return fqfile_read(&(f_in.files[pair]->file), b, b_size);
@@ -24,10 +25,24 @@ void fqprocess_fasta_header1Block(fqflag pair, char *block, fqbytecount block_n,
 }
 
 void fqprocess_fasta_sequenceBlock(fqflag pair, char *block, fqbytecount block_n, char final){
-    fqfsout_write(&f_out, pair, block, block_n);
-    if(final == 1){
-        fqfsout_writechar(&f_out, pair, '\n');
-    }
+	fqbytecount line_remaining = line_length - current_line;
+	if((line_length == 0) || line_remaining >= block_n){
+        fqfsout_write(&f_out, pair, block, block_n);
+		current_line += block_n;
+		if(final == 1){
+            fqfsout_writechar(&f_out, pair, '\n');
+			current_line = 0;
+		}
+	} else {
+		long int block_remaining = block_n;
+		while(block_remaining > 0){
+			char *new_string = strndup(block + (block_n - block_remaining), line_remaining);
+            fqfsout_write(&f_out, pair, new_string, strlen(new_string));
+            fqfsout_writechar(&f_out, pair, '\n');
+			block_remaining -= line_remaining;
+			free(new_string);
+		}
+	}
 }
 
 fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options){
@@ -36,14 +51,24 @@ fqstatus fqprocess_fasta(int argc, const char *argv[], fqglobal options){
     options.default_output_format = FQ_FORMAT_FASTA;
     int option;
     fqstatus result;
+	char *convert_err = NULL;
     char finished = 0;
 
     //Parse the subcommand options:
     optind++; // Skip the subcommand argument
-    while((option = getopt(argc, (char* const*)argv, "+hko:")) != -1){
+    while((option = getopt(argc, (char* const*)argv, "+hko:l:")) != -1){
         switch(option){
             case 'h':{fqprocess_fasta_help(); return FQ_STATUS_OK;}
             case 'k':{options.keep_headers = 1; break;}
+			case 'l':{
+				line_length = strtoul(optarg, &convert_err, 10);
+				if(convert_err[0] != '\0'){
+					fprintf(stderr, "ERROR: invalid line length\n");
+					fqprocess_fasta_usage();
+					return FQ_STATUS_FAIL;
+				}
+				break;
+			} // end max line switch
             case 'o':{options.output_filename_specified = 1; options.file_output_stem = optarg; break;}
             default:{fqprocess_fasta_usage(); return FQ_STATUS_FAIL;}
         }
