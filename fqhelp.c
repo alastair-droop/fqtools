@@ -62,6 +62,7 @@ void global_help(){
     printf("type      Attempt to guess the FASTQ quality encoding type\n");
     printf("validate  Validate FASTQ files\n");
     printf("find      Find FASTQ reads containing specific sequences\n");
+    printf("trim      Trim reads in a FASTQ file\n");
 }
 
 void fqprocess_view_usage(){
@@ -105,7 +106,7 @@ void fqprocess_find_usage(){
 }
 
 void fqprocess_trim_usage(){
-    printf("TODO\n");
+    printf("usage: %s [...] trim [-hk] [-o OUTFILE] [-s LENGTH] [-l LENGTH] [FILE] [FILE]\n", PROG_NAME);
 }
 
 void fqprocess_view_help(){
@@ -284,6 +285,26 @@ void fqprocess_find_help(){
 }
 
 void fqprocess_trim_help(){
-    printf("TODO\n");
+    printf("View FASTQ files.\n");
+    printf("\n");
+    printf("view options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  -k               Preserve secondary headers (if present).\n");
+    printf("  -o STEM          Output file stem (default \"output%%\").\n");
+    printf("  -s LENGTH        Trim LENGTH bases from the read start.\n");
+    printf("  -l LENGTH        Trim the read to a maximum length of LENGTH.\n");
+    printf("  FILE             The fastq file(s) to view.\n");
+    printf("\n");
+    printf("STEM:\n");
+    printf("    The file stem to use for output files (without file extension). Any\n");
+    printf("    instances of the single character specified using the -p global argument\n");
+    printf("    will be replaced with the pair number, or removed for single output\n");
+    printf("    files. If the -o option is not specified, single file output will\n");
+    printf("    be written to stdout and paired file output to the default stem (output%%).\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+    printf("\n");
+    printf("LENGTH:\n");
+    printf("    If LENGTH is not specified, no trimming is performed.\n");
 }
-
