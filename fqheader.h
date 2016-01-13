@@ -93,6 +93,7 @@ fqstatus fqprocess_type(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_validate(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_find(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_trim(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_qualmap(int argc, const char *argv[], fqglobal options);
 
 #include "fqbuffer.h"
 #include "fqfile.h"

@@ -63,6 +63,7 @@ void global_help(){
     printf("validate  Validate FASTQ files\n");
     printf("find      Find FASTQ reads containing specific sequences\n");
     printf("trim      Trim reads in a FASTQ file\n");
+    printf("qualmap   Translate quality values using a mapping file\n");
 }
 
 void fqprocess_view_usage(){
@@ -108,6 +109,11 @@ void fqprocess_find_usage(){
 void fqprocess_trim_usage(){
     printf("usage: %s [...] trim [-hk] [-o OUTFILE] [-s LENGTH] [-l LENGTH] [FILE] [FILE]\n", PROG_NAME);
 }
+
+void fqprocess_qualmap_usage(){
+    printf("usage: %s [...] qualmap [-hk] [-o OUTFILE] MAP [FILE] [FILE]\n", PROG_NAME);
+}
+
 
 void fqprocess_view_help(){
     printf("View FASTQ files.\n");
@@ -307,4 +313,30 @@ void fqprocess_trim_help(){
     printf("\n");
     printf("LENGTH:\n");
     printf("    If LENGTH is not specified, no trimming is performed.\n");
+}
+
+void fqprocess_qualmap_help(){
+    printf("Translate quality values using a mapping file.\n");
+    printf("\n");
+    printf("qualmap options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  -k               Preserve secondary headers (if present).\n");
+    printf("  -o STEM          Output file stem (default \"output%%\").\n");
+    printf("  MAP              The mapping file to use (see below)\n");
+    printf("  FILE             The fastq file(s) to view.\n");
+    printf("\n");
+    printf("STEM:\n");
+    printf("    The file stem to use for output files (without file extension). Any\n");
+    printf("    instances of the single character specified using the -p global argument\n");
+    printf("    will be replaced with the pair number, or removed for single output\n");
+    printf("    files. If the -o option is not specified, single file output will\n");
+    printf("    be written to stdout and paired file output to the default stem (output%%).\n");
+    printf("\n");
+    printf("MAP:\n");
+    printf("    The base quality translation table. This should be a text file with a single\n");
+    printf("    line containing 94 characters. These will correspond to the valid quality\n");
+    printf("    characters from '!' to '~'. Any characters outside that range will be clipped\n");
+    printf("\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
 }

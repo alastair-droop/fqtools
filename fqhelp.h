@@ -17,6 +17,7 @@ void fqprocess_type_usage();
 void fqprocess_validate_usage();
 void fqprocess_find_usage();
 void fqprocess_trim_usage();
+void fqprocess_qualmap_usage();
 
 void fqprocess_view_help();
 void fqprocess_head_help();
@@ -29,3 +30,4 @@ void fqprocess_type_help();
 void fqprocess_validate_help();
 void fqprocess_find_help();
 void fqprocess_trim_help();
+void fqprocess_qualmap_help();
