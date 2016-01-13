@@ -18,13 +18,13 @@ EXEC=fqtools
 .PHONY: all tests clean fqtools
 
 fqtools:
-	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o$(BIN)/$(EXEC) -lz -lhts $(MODULE_LIST) $(SUBPROCESS_FILES) $(SRC)/fqtools.c
+	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o$(BIN)/$(EXEC) $(MODULE_LIST) $(SUBPROCESS_FILES) $(SRC)/fqtools.c -lz -lhts
 
 tests:
-	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o $(TEST_BIN)/test-fqbuffer -I$(SRC) -I$(TEST_SRC) $(MODULE_LIST) -lz -lhts $(TEST_SRC)/test-fqbuffer.c
+	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o $(TEST_BIN)/test-fqbuffer -I$(SRC) -I$(TEST_SRC) $(MODULE_LIST) $(TEST_SRC)/test-fqbuffer.c -lz -lhts 
 
 scratch:
-	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o$(BIN)/fqtest -lz -lhts $(MODULE_LIST) $(SRC)/scratch.c
+	$(CC) $(CFLAGS) -I$(HTSDIR) -L$(HTSDIR) -o$(BIN)/fqtest $(MODULE_LIST) $(SRC)/scratch.c -lz -lhts 
 
 all: fqtools tests
 
