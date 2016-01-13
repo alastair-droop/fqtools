@@ -7,8 +7,6 @@ fqparser_callbacks callbacks;
 char interleaving_out;
 char *translation_table;
 
-// quality_trans = bytearray.maketrans(b'!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJK', b'##########,,,,,,,,,,77777<<<<<AAAAAFFFFFKKK')
-
 fqbytecount fqprocess_qualmap_readBuffer(fqflag pair, char *b, fqbytecount b_size){
     return fqfile_read(&(f_in.files[pair]->file), b, b_size);
 }
