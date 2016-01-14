@@ -42,6 +42,7 @@ fqflag format_type(char f){
         case 'F': return FQ_FORMAT_FASTQ;
         case 'f': return FQ_FORMAT_FASTQ_GZ;
         case 'b': return FQ_FORMAT_BAM;
+        case 's': return FQ_FORMAT_BAM;
         case 'u': default: return FQ_FORMAT_UNKNOWN;
     }
 }

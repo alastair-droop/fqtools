@@ -373,6 +373,7 @@ fqflag guess_filename_format(char *filename){
     if(strstr(f, ".fasta") != NULL) result = FQ_FORMAT_FASTA;
     if(strstr(f, ".fasta.gz") != NULL) result = FQ_FORMAT_FASTA_GZ;
     if(strstr(f, ".bam") != NULL) result = FQ_FORMAT_BAM;
+    if(strstr(f, ".sam") != NULL) result = FQ_FORMAT_BAM;
     free(f);
     return result;
 }

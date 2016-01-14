@@ -58,7 +58,8 @@ void global_help(){
     printf("FORMAT:\n");
     printf("    F  uncompressed FASTQ format (.fastq)\n");
     printf("    f  compressed FASTQ format (.fastq.gz)\n");
-    printf("    b  unaligned BAM format (.bam)\n");
+    printf("    b  BAM format (.bam)\n");
+    printf("    s  SAM format (.sam)\n");
     printf("    u  attempt to infer format from file extension, (default .fastq.gz)\n");
     printf("\n");
     printf("COMMAND:\n");
