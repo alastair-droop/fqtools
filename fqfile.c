@@ -368,10 +368,10 @@ fqflag guess_filename_format(char *filename){
     if(f == NULL) return FQ_FORMAT_UNKNOWN;
     f[strlen(filename)] = '\0';
     for(i=0; i < strlen(filename); i++) f[i] = tolower(filename[i]);
-    if(strstr(f, ".fastq.gz") != NULL) result = FQ_FORMAT_FASTQ_GZ;
     if(strstr(f, ".fastq") != NULL) result = FQ_FORMAT_FASTQ;
-    if(strstr(f, ".fasta.gz") != NULL) result = FQ_FORMAT_FASTA_GZ;
+    if(strstr(f, ".fastq.gz") != NULL) result = FQ_FORMAT_FASTQ_GZ;
     if(strstr(f, ".fasta") != NULL) result = FQ_FORMAT_FASTA;
+    if(strstr(f, ".fasta.gz") != NULL) result = FQ_FORMAT_FASTA_GZ;
     if(strstr(f, ".bam") != NULL) result = FQ_FORMAT_BAM;
     free(f);
     return result;
