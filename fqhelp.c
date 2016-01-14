@@ -72,6 +72,7 @@ void global_help(){
     printf("fasta     Convert FASTQ files to FASTA format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
     printf("qualtab   Tabulate FASTQ quality character frequencies\n");
+    printf("lengthtab Tabulate FASTQ read lengths\n");
     printf("type      Attempt to guess the FASTQ quality encoding type\n");
     printf("validate  Validate FASTQ files\n");
     printf("find      Find FASTQ reads containing specific sequences\n");
@@ -104,7 +105,11 @@ void fqprocess_basetab_usage(){
 }
 
 void fqprocess_qualtab_usage(){
-    printf("usage: %s [...] quality [-h] [FILE] [FILE]\n", PROG_NAME);
+    printf("usage: %s [...] qualtab [-h] [FILE] [FILE]\n", PROG_NAME);
+}
+
+void fqprocess_lengthtab_usage(){
+    printf("usage: %s [...] lengthtab [-h] [FILE]\n", PROG_NAME);
 }
 
 void fqprocess_type_usage(){
@@ -246,6 +251,17 @@ void fqprocess_qualtab_help(){
 	printf("are tabulated for all possible characters (33-127). If a quality type\n");
 	printf("is specified, the quality score and approximate probability of error\n");
 	printf("are returned for only the valid characters.\n");
+}
+
+void fqprocess_lengthtab_help(){
+    printf("Tabulate FASTQ read lengths.\n");
+    printf("\n");
+    printf("lengthtab options:\n");
+    printf("  -h               Show this help message and exit.\n");
+    printf("  FILE             The fastq file(s) to count.\n");
+    printf("FILE:\n");
+    printf("    If no input file is specified, input will be read from stdin.\n");
+	printf("\n");
 }
 
 void fqprocess_type_help(){

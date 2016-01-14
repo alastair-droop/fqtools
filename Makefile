@@ -8,7 +8,7 @@ HTSDIR=./htslib
 TEST_SRC=./tests
 TEST_BIN=./tests
 
-SUBPROCESSES=view head count blockview fasta basetab qualtab type validate find trim qualmap
+SUBPROCESSES=view head count blockview fasta basetab qualtab lengthtab type validate find trim qualmap
 SUBPROCESS_FILES=$(addsuffix .c, $(addprefix fqprocess_, $(SUBPROCESSES)))
 MODULES=fqbuffer.c fqfile.c fqfsin.c fqfsout.c fqfileprep.c fqparser.c fqgenerics.c fqhelp.c
 MODULE_LIST=$(addprefix $(SRC)/, $(MODULES))
