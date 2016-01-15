@@ -10,7 +10,7 @@ import gzip
 # Set the default directories:
 ref_dir = os.path.join('.', 'reference')
 temp_dir = os.path.join('.', 'temp')
-fqtools_exec = '/Users/alastair/Desktop/fqtools-rewrite/fqtools/fqtools'
+fqtools_exec = '../../fqtools'
 
 # Set the file input types:
 file_kind = {'SN':'single, non-interleaved', 'SI':'single, interleaved', 'PN':'paired, non-interleaved'}
@@ -129,6 +129,3 @@ for in_kind in ['bam', 'sam']:
                 if error == True: exit(1)
 
 print('{} tests complete'.format(n_tests))
-
-
-
