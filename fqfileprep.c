@@ -63,7 +63,7 @@ fqstatus prepare_filesets(fqfsin *in, fqfsout *out, int n_infiles, const char *i
                 if(outformat_1 == FQ_FORMAT_FASTQ_GZ) outformat_1 = FQ_FORMAT_FASTA_GZ;
             }
             if(outformat_1 == FQ_FORMAT_BAM) outformat_1 = FQ_FORMAT_FASTQ;
-            result = fqfsout_open_single(out, NULL, outformat_1, options.output_bufsize);
+            result = fqfsout_open_single(out, NULL, options.output_interleaving, outformat_1, options.output_bufsize);
             if(result != FQ_STATUS_OK) {fqfsin_close(in); goto finish;}        
         }
         if((n_outfiles == 1) && (options.output_filename_specified == 1)){
@@ -75,7 +75,7 @@ fqstatus prepare_filesets(fqfsin *in, fqfsout *out, int n_infiles, const char *i
             }
             if(outformat_1 == FQ_FORMAT_BAM) outformat_1 = FQ_FORMAT_FASTQ;
             outfile_1 = generate_filename(options.file_output_stem, options.file_pair_replacement, 0, outformat_1);
-            result = fqfsout_open_single(out, outfile_1, outformat_1, options.output_bufsize);
+            result = fqfsout_open_single(out, outfile_1, options.output_interleaving, outformat_1, options.output_bufsize);
             if(result != FQ_STATUS_OK) {fqfsin_close(in); goto finish;}
         }
         if(n_outfiles == 2){

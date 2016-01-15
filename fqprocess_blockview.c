@@ -67,7 +67,7 @@ fqstatus fqprocess_blockview(int argc, const char *argv[], fqglobal options, cha
         fprintf(stderr, "ERROR: failed to initialize IO\n");
         return FQ_STATUS_FAIL;
     }
-    result = fqfsout_open_single(&f_out, NULL, FQ_FORMAT_FASTQ, options.output_bufsize);
+    result = fqfsout_open_single(&f_out, NULL, FQ_NONINTERLEAVED, FQ_FORMAT_FASTQ, options.output_bufsize);
     if(result != FQ_STATUS_OK){
         fprintf(stderr, "ERROR: failed to initialize IO\n");
         return FQ_STATUS_FAIL;
