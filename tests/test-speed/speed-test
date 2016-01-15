@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+from time import perf_counter
+from subprocess import call, DEVNULL
+import os.path
+
+# Set the tools:
+tools = {
+    'bash-plain' : {'exec': 'cat', 'arg': ' {} > {}', 'plain':True, 'compressed':False},
+    'bash-compressed' : {'exec': 'gzcat', 'arg': ' {} > {}', 'plain':False, 'compressed':True},
+    'fast' : {'exec': 'fashead', 'arg': '-q -n100000 {} > {}', 'plain':True, 'compressed':False},
+    'fqtools' : {'exec': 'fqtools', 'arg': 'view {} > {}', 'plain':True, 'compressed':True},
+    'seqtk' : {'exec': 'seqtk', 'arg': 'seq {} > {}', 'plain':True, 'compressed':True},
+    'bioawk' : {'exec': 'bioawk', 'arg': '-cfastx \'{{print "@"$name; print $seq; print "+"; print $qual}}\' {} > {}', 'plain':True, 'compressed':True},
+    'seqmagick' : {'exec': 'seqmagick', 'arg': 'convert {} {}', 'plain':True, 'compressed':True},
+    'fastx-toolkit': {'exec': 'fastx_renamer', 'arg': '-nSEQ -i{} > {}', 'plain':True, 'compressed':False}
+}
+
+# Set the run files:
+reads = 100000
+files = {'plain':os.path.join('.', 'test-100k.fastq'), 'compressed':os.path.join('.', 'test-100k.fastq.gz')}
+tmp_files = {'plain':os.path.join('.', 'tmp.fastq'), 'compressed':os.path.join('.', 'tmp.fastq.gz')}
+
+# Set the number of iterations to perform:
+n = 50
+
+# Get the tool name length:
+nlen = 0
+for tool in tools.keys(): nlen = max(nlen, len(tool))
+
+# Write the setup information:
+for ftype in ['plain', 'compressed']: print('# {:10} file: {}'.format(ftype, files[ftype]))
+print('{} iterations per test'.format(n))
+print('{} reads per input file'.format(reads))
+print('')
+for tool in sorted(tools.keys()):
+    tool_str = '{} {}'.format(tools[tool]['exec'], tools[tool]['arg'])
+    name_str = '{{:{}}}'.format(nlen)
+    print('{} = "{}"'.format(name_str.format(tool), tool_str))
+print('')
+
+for ftype in ['plain', 'compressed']:
+    for tool in sorted(tools.keys()):
+        tool_str = name_str.format(tool)
+        type_str = '{:10}'.format(ftype)
+        filename = files[ftype]
+        tmp_filename = tmp_files[ftype]
+        if tools[tool][ftype] != True:
+            print('{}\t{}\t{:>10}'.format(tool_str, type_str, '-'))
+            continue
+        command_str = '{} {}'.format(tools[tool]['exec'], tools[tool]['arg'].format(filename, tmp_filename))
+        try:
+            results = []
+            for i in range(n):
+                tstart = perf_counter()
+                call(command_str, shell=True, stdout=DEVNULL)
+                tend = perf_counter()
+                results.append(tend - tstart)
+            result = reads / min(results)
+            print('{}\t{}\t{:10}'.format(tool_str, type_str, int(result)))
+        except:
+            print('{}\t{}\t{:>10}'.format(tool_str, type_str, 'FAILED'))

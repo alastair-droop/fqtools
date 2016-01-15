@@ -1,0 +1,32 @@
+# plain      file: ./test-100k.fastq
+# compressed file: ./test-100k.fastq.gz
+50 iterations per test
+100000 reads per input file
+
+bash-compressed = "gzcat  {} > {}"
+bash-plain      = "cat  {} > {}"
+bioawk          = "bioawk -cfastx '{{print "@"$name; print $seq; print "+"; print $qual}}' {} > {}"
+fast            = "fashead -q -n100000 {} > {}"
+fastx-toolkit   = "fastx_renamer -nSEQ -i{} > {}"
+fqtools         = "fqtools view {} > {}"
+seqmagick       = "seqmagick convert {} {}"
+seqtk           = "seqtk seq {} > {}"
+
+bash-compressed	plain     	         -
+bash-plain     	plain     	   2605421
+bioawk         	plain     	    434632
+fast           	plain     	      2984
+fastx-toolkit  	plain     	     69762
+fqtools-1      	plain     	    543008
+fqtools-1M     	plain     	    701375
+seqmagick      	plain     	     25325
+seqtk          	plain     	   1122355
+bash-compressed	compressed	    934331
+bash-plain     	compressed	         -
+bioawk         	compressed	    312708
+fast           	compressed	         -
+fastx-toolkit  	compressed	         -
+fqtools-1      	compressed	    369358
+fqtools-1M     	compressed	    444648
+seqmagick      	compressed	      4000
+seqtk          	compressed	    545865

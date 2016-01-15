@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+import argparse
+import subprocess
+from os import listdir
+import os.path
+import re
+
+# Set the tools:
+tools = {
+    'fast' : {'exec': 'faslen', 'arg': '-q -t {}', 'status':{'valid':'PASS', 'invalid':'PASS'}},
+    'fqtools' : {'exec': 'fqtools', 'arg': '-dramul validate {}', 'status':{'valid':'PASS', 'invalid':'PASS'}},
+    'seqtk' : {'exec': 'seqtk', 'arg': 'seq -l0 {}', 'status':{'valid':'PASS', 'invalid':'PASS'}},
+    'bioawk' : {'exec': 'bioawk', 'arg': '-cfastx \'{{print "@"$name; print $seq; print "+"; print $qual}}\' {}', 'status':{'valid':'PASS', 'invalid':'PASS'}},
+    'seqmagick' : {'exec': 'seqmagick', 'arg': 'info {}', 'status':{'valid':'PASS', 'invalid':'PASS'}},
+    'fastx-toolkit': {'exec': 'fastx_quality_stats', 'arg': '-i {}', 'status':{'valid':'PASS', 'invalid':'PASS'}}
+}
+
+# Sort the testset files:
+testset_path = os.path.join('.', 'cock-testset')
+file_re = re.compile('^((error_)?[^.]+)\\.fastq(\\.gz)?$')
+testset = {'valid':{}, 'invalid':{}}
+for f in listdir(testset_path):
+  match = file_re.match(f)
+  if match == None: continue
+  if match.group(2) == None: ftype = 'valid'
+  else: ftype = 'invalid'
+  testset[ftype][match.group(1)] = f
+
+# Get the tool strings:
+tool_len = 0
+for tool in tools.keys(): tool_len = max(tool_len, len(tool))
+    
+# Get the testfile name lengths:
+file_len = 0
+for validity in ['valid', 'invalid']:
+    for f in testset[validity].keys(): file_len = max(file_len, len(f))
+
+# Write the setup information:
+for tool in sorted(tools.keys()):
+    tool_str = '{} {}'.format(tools[tool]['exec'], tools[tool]['arg'])
+    name_str = '{{:{}}}'.format(tool_len)
+    print('{} = "{}"'.format(name_str.format(tool), tool_str))
+print('')
+
+for tool in tools.keys():
+    for validity in testset.keys():
+        for f in testset[validity]:
+            filename = os.path.join(testset_path, testset[validity][f])
+            command = tools[tool]['exec']
+            args = tools[tool]['arg'].format(filename)
+            tool_str = '{{:{}}}'.format(tool_len).format(tool)
+            file_str = '{{:{}}}'.format(file_len).format(f)
+            try:
+                res = subprocess.check_output(args=' '.join([command, args]), stdin=None, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+                if validity == 'valid': tool_result = 'PASS'
+                if validity == 'invalid': tool_result = 'FAIL'
+            except:
+                if validity == 'valid': tool_result = 'FAIL'
+                if validity == 'invalid': tool_result = 'PASS'
+            print('{}\t{:7}\t{}\t{}'.format(tool_str, validity, file_str, tool_result))
+            if tool_result == 'FAIL': tools[tool]['status'][validity] = 'FAIL'
+
+# Print the summary:
+print('')
+for tool in tools.keys():
+    tool_str = '{{:{}}}'.format(tool_len).format(tool)
+    print('{}\t{}\t{}'.format(tool_str, tools[tool]['status']['valid'], tools[tool]['status']['invalid']))
