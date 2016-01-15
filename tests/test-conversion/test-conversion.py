@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+
+import hashlib
+import subprocess
+from os import listdir
+import os.path
+from sys import exit
+import gzip
+
+# Set the default directories:
+ref_dir = os.path.join('.', 'reference')
+temp_dir = os.path.join('.', 'temp')
+fqtools_exec = '/Users/alastair/Desktop/fqtools-rewrite/fqtools/fqtools'
+
+# Set the file input types:
+file_kind = {'SN':'single, non-interleaved', 'SI':'single, interleaved', 'PN':'paired, non-interleaved'}
+file_compression = {'U':'uncompressed', 'C':'compressed'}
+
+def fileMD5(filename):
+    if '.gz' in filename: return hashlib.md5(gzip.open(filename,'rb').read()).hexdigest()
+    return hashlib.md5(open(filename,'rb').read()).hexdigest()
+
+def inFlags(kind, compression, bam=False):
+    output = []
+    if kind == 'SI': output.append('-i')
+    if bam == False:
+        if compression == 'C': output.append('-ff')
+        else: output.append('-fF')
+    else: output.append('-fb')
+    return ' '.join(output)        
+
+def outFlags(kind, compression, bam=False):
+    output = []
+    if kind == 'SI': output.append('-I')
+    if compression == 'C': output.append('-Ff')
+    else: output.append('-FF')
+    return ' '.join(output)
+
+def getBAMFilenames(reference, bam_type, kind, compression):
+    if reference == True: file_dir = ref_dir
+    else: file_dir = temp_dir        
+    if reference == True: return [os.path.join(ref_dir, 't.{}'.format(bam_type))]
+    if compression == 'U': extension = 'fastq'
+    else: extension = 'fastq.gz'
+    if kind == 'PN': files = ['t1', 't2']
+    else: files = ['t-interleaved']
+    return [os.path.join(file_dir, '{}.{}'.format(f, extension)) for f in files]
+        
+def getFilenames(reference, kind, compression):
+    if reference == True: file_dir = ref_dir
+    else: file_dir = temp_dir        
+    if compression == 'U': extension = 'fastq'
+    else: extension = 'fastq.gz'
+    if kind == 'SN': files = ['t1']
+    elif kind == 'SI': files = ['t-interleaved']
+    elif kind == 'PN': files = ['t1', 't2']
+    return [os.path.join(file_dir, '{}.{}'.format(f, extension)) for f in files]
+
+def compareFiles(kind, compression, bam=None, verbose=True):
+    if bam == None:
+        test_files = getFilenames(False, kind, compression)
+        ref_files = getFilenames(True, kind, compression)
+    else:
+        test_files = getBAMFilenames(False, bam, kind, compression)
+        ref_files = [f.replace(temp_dir, ref_dir) for f in getBAMFilenames(False, bam, kind, compression)]
+    result = 'OK'
+    for i in range(len(test_files)):
+        test_file = test_files[i]
+        ref_file = ref_files[i]
+        test_md5 = fileMD5(test_file)
+        ref_md5 = fileMD5(ref_file)
+        status = (test_md5 == ref_md5)
+        if status == True: result = 'OK'
+        else: result = 'Failed'
+        if verbose == True: print('{} ({}) -> {} ({}): {}'.format(test_file, test_md5, ref_file, ref_md5, result))
+        if result == 'Failed': break
+    if result == 'OK': return False
+    return True
+
+n_tests = 0
+
+# Test the non-BAM format data conversion:
+for in_kind in ['SN', 'SI', 'PN']:
+    for in_compression in ['U', 'C']:
+        if in_kind == 'SN': out_kinds = ['SN']
+        elif in_kind == 'SI': out_kinds = ['SI', 'PN']
+        elif in_kind == 'PN': out_kinds = ['SI', 'PN']
+        for out_kind in out_kinds:
+            for out_compression in ['U', 'C']:
+                input_filenames = ' '.join(getFilenames(True, in_kind, in_compression))
+                if out_kind == 'SI': output_stem = os.path.join(temp_dir, 't-interleaved%')
+                elif out_kind == 'SN': output_stem = os.path.join(temp_dir, 't1%')
+                else: output_stem = os.path.join(temp_dir, 't%')
+                input_flags = inFlags(in_kind, in_compression)
+                output_flags = outFlags(out_kind, out_compression)
+                test_exec = '{} {} {} view -o{} {}'.format(fqtools_exec, input_flags, output_flags, output_stem, input_filenames)
+                error = False
+                try: res = subprocess.check_output(args=test_exec, stdin=None, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+                except: error = True
+                else: error = compareFiles(out_kind, out_compression, verbose=False)
+                if error == True: result = 'FAILED'
+                else: result = 'OK    '
+                print('{} [{} {} -> {} {}]: {}'.format(result, in_kind, in_compression, out_kind, out_compression, test_exec))
+                n_tests += 1
+                if error == True: exit(1)
+
+# Test the BAM format data conversion:
+for in_kind in ['bam', 'sam']:
+    for in_interleaving in ['SN', 'SI']:
+        for out_kind in ['SN', 'SI', 'PN']:
+            for out_compression in ['U', 'C']:
+                if (in_interleaving == 'SN') and (out_kind != 'SN'): continue
+                input_filename = getBAMFilenames(True, in_kind, out_kind, out_compression)[0]
+                output_filenames = getBAMFilenames(False, in_kind, out_kind, out_compression)
+                input_flags = inFlags(in_interleaving, None, bam=True)
+                output_flags = outFlags(out_kind, out_compression)
+                if out_kind == 'SI': output_stem = os.path.join(temp_dir, 't-interleaved%')
+                elif out_kind == 'SN': output_stem = os.path.join(temp_dir, 't-interleaved%')
+                else: output_stem = os.path.join(temp_dir, 't%')
+                test_exec = '{} {} {} view -o{} {}'.format(fqtools_exec, input_flags, output_flags, output_stem, input_filename)
+                error = False
+                try: res = subprocess.check_output(args=test_exec, stdin=None, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+                except: error = True
+                else: error = compareFiles(out_kind, out_compression, bam=in_kind, verbose=False)
+                if error == True: result = 'FAILED'
+                else: result = 'OK    '
+                print('{} [{} {} -> {} {}]: {}'.format(result, in_interleaving, in_kind, out_kind, out_compression, test_exec))
+                n_tests += 1
+                if error == True: exit(1)
+
+print('{} tests complete'.format(n_tests))
+
+
+
