@@ -403,7 +403,7 @@ void convert_sequence(char *in_seq, char *out_seq, int n, char reversed){
     int8_t seq_comp_table[16] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
     char *p = out_seq;
     int i;
-    if(reversed == 1){
+    if(reversed != 0){
         for(i = n - 1; i > -1; --i){
             *p = seq_nt16_str[seq_comp_table[bam_seqi(in_seq, i)]];
             p++;
@@ -419,7 +419,7 @@ void convert_sequence(char *in_seq, char *out_seq, int n, char reversed){
 void convert_quality(char *in_qual, char *out_qual, int n, char reversed, char offset){
     char *p = out_qual;
     int i;
-    if(reversed == 1){
+    if(reversed != 0){
         for(i = n - 1; i > -1; --i){
             *p = in_qual[i] + offset;
             p++;
