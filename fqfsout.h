@@ -13,19 +13,6 @@
 
 #include "fqheader.h"
 
-// typedef struct{
-//     fqfile file;
-//     fqbuffer buffer;
-//     fqbytecount trigger;
-// } fqbfile;
-//
-// fqstatus fqbfile_open(fqbfile *f, const char *filename, fqflag format, fqbytecount b_size);
-// fqstatus fqbfile_writechar(fqbfile *f, char c);
-// fqstatus fqbfile_write(fqbfile *f, char *buffer, fqbytecount buffer_n);
-//
-// void fqbfile_flush(fqbfile *f);
-// void fqbfile_close(fqbfile *f);
-
 typedef struct{
     char n_files;
     fqflag interleaved;
