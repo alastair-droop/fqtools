@@ -11,11 +11,18 @@ Installation
 * `zlib` is required for processing compressed (`.gz`) data. The code relies on several recent zlib file IO functions, so must be a version >= 1.2.3.5.
 * `htslib` is required for reading BAM files. If htslib is not installed, download and compile `htslib`. Then, alter the `HTSDIR` path in the `fqtools` Makefile to point to the htslib source directory.
 
-Once `fqtools` can find both `zlib` and `htslib`, compilation should be sucessful with:
+If ZLib is already installed, building can be performed similar to the following:
 
+    git clone https://github.com/alastair-droop/fqtools
     cd fqtools/
-    ./make
-    
+    git clone https://github.com/samtools/htslib
+    cd htslib/
+    autoconf 
+    ./configure
+    make
+    cd ..
+    make
+        
 Licence
 =======
 
