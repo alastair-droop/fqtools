@@ -362,7 +362,7 @@ char* generate_filename(char *stem, char rep_chr, char pair, fqflag format){
 // Guess the file format by its name:
 fqflag guess_filename_format(char *filename){
     fqflag result = FQ_FORMAT_UNKNOWN;
-    int i;
+    unsigned long i;
     if(filename == NULL) return guess_stdin_format();
     char *f = malloc(sizeof(char) * (strlen(filename) + 1));
     if(f == NULL) return FQ_FORMAT_UNKNOWN;

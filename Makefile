@@ -3,7 +3,7 @@ BIN=.
 HTSDIR=./htslib
 
 CFLAGS+=-O2 -g
-CPPFLAGS+=-Wall -Wextra -I$(HTSDIR)
+CPPFLAGS+=-Wall -Wextra -Wno-unused-parameter -I$(HTSDIR)
 LIBS=-lz -lhts -lm
 
 TEST_SRC=./tests
