@@ -27,8 +27,11 @@ If ZLib is already installed, building can be performed similar to the following
     autoconf 
     ./configure
     make
+    make install
     cd ..
     make
+
+The `htslib` library must be installed into a location that the built `fqtools` program can find (as `fqtools` executable is [dynamically linked](https://en.wikipedia.org/wiki/Dynamic_linker) to the `htslib` library). So, if you can not (or do not want to) install HTSlib, you must add the location of the `libhts.so` file to your `LD_LIBRARY_PATH` variable.
         
 Licence
 =======
