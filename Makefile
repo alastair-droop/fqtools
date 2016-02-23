@@ -1,5 +1,5 @@
-SRC=.
-BIN=.
+SRC=./src
+BIN=./bin
 HTSDIR=./htslib
 
 CFLAGS+=-O2 -g
@@ -36,7 +36,7 @@ scratch:
 all: fqtools tests
 
 clean:
-	rm -f *.o
+	rm -f $(SRC)/*.o
 	rm -f $(BIN)/fqtools
 	rm -f $(TEST_BIN)/test-fqbuffer
 	rm -f $(BIN)/fqtest
