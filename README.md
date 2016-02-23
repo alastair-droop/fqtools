@@ -3,6 +3,13 @@ Introduction
 
 `fqtools` is a software suite for fast processing of `FASTQ` files. Various file manipulations are supported. See below for a full list of the subcommands available and a brief description of their purpose. Most of the individual subcommands will take either a single file or a pair of files as input. If no input file is specified, fqtools will attempt to read data from `stdin`. In this case, it is advisabe to specify the format of the data provided. For subcommands that generate FASTQ data, either a single file or a pair of files will be generated. If no `-o` argument is provided, single files will be writted to `stdout`.
 
+Citation
+========
+
+If you use `fqtools` in pblished work, please can you include a reference to my [Bioinformatics paper](https://doi.org/10.1093/bioinformatics/btw088):
+
+*   Droop, A. P. (2016). fqtools: An efficient software suite for modern FASTQ file manipulation. *Bioinformatics* (Oxford, England). [**DOI**:[10.1093/bioinformatics/btw088](https://doi.org/10.1093/bioinformatics/btw088)]
+
 Installation
 ============
 
