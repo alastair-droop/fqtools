@@ -25,6 +25,7 @@ $(SRC)/%.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(SRC)/$@ $^
 
 fqtools: $(SUBPROCESS_OBJECTS) $(MODULE_OBJECTS) $(SRC)/fqtools.o
+	mkdir -p bin
 	$(CC) $(CFLAGS) -L$(HTSDIR) -o$(BIN)/$(EXEC) $^ $(LIBS)
 
 tests: fqtools $(TEST_SRC)/test-fqbuffer.c
