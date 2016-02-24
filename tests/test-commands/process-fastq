@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+from sys import exit
+import argparse
+
+version = '1.0 (2016-02-24)'
+
+# Set up & parse the command line arguments:
+parser = argparse.ArgumentParser(description = 'Basic FASTQ manipulation in Python', fromfile_prefix_chars='@')
+parser.add_argument('-v', '--version', action='version', version='%(prog)s {0}'.format(version))
+# parser.add_argument('-n', '--number', dest='number', type=int, default=1, help='The number of reads to generate')
+# parser.add_argument('-b', '--bases', dest='nucleotides', type=str, default='ATGCN', help='The valid nucleotides to use')
+# parser.add_argument('-q', '--quality', dest='quality', choices=['sanger', 'solexa', 'illumina'], default='sanger', help='The FASTQ quality encoding method')
+# parser.add_argument('-p', '--paired', dest='paired', action='store_true', default=False, help='Should paired files be generated?')
+# parser.add_argument('-l', '--lower', dest='length_min', type=int, default=1, help='The minimum read length to generate')
+# parser.add_argument('-u', '--upper', dest='length_max', type=int, default=100, help='The maximum read length to generate')
+# parser.add_argument('-f', '--filestem', dest='output_filename', type=str, default='output_{}.fastq', help='The output file stem to use.')
+# parser.add_argument('-o', '--output', dest='output', choices=['full', 'header', 'sequence', 'header2', 'quality'], default='full', help='part of the read to return')
+parser.add_argument(dest='command', choices=['view', 'fasta', 'header', 'sequence', 'header2', 'quality'], default='view', help='The command to run')
+parser.add_argument(dest='filename', help='The FASTQ file to process')
+args = parser.parse_args()
+
+# Function to return an error:
+def error(message): exit('ERROR: {}'.format(message))
+
+class FQRead(object):
+    def __init__(self, f):
+        self.header = f.readline().strip().lstrip('@')
+        if self.header == '': raise Exception()
+        self.sequence = f.readline().strip()
+        self.header2 = f.readline().strip().lstrip('+')
+        self.quality = f.readline().strip()
+    def printFASTQ(self):
+        print('@{}'.format(self.header))
+        print(self.sequence)
+        print('+{}'.format(self.header2))
+        print(self.quality)
+    def printFASTA(self):
+        print('>{}'.format(self.header))
+        print(self.sequence)
+        
+# Open the input file:
+try: input_file = open(args.filename, 'rt')
+except: error('failed to open file "{}"'.format(args.filename))
+
+if args.command == 'fasta':
+    try:
+        while True: FQRead(input_file).printFASTA()
+    except: pass
+
+elif args.command == 'header':
+    try:
+        while True:
+            print(FQRead(input_file).header)
+    except: pass
+    
+elif args.command == 'sequence':
+    try:
+        while True:
+            print(FQRead(input_file).sequence)
+    except: pass
+    
+elif args.command == 'header2':
+    try:
+        while True:
+            print(FQRead(input_file).header2)
+    except: pass
+    
+elif args.command == 'quality':
+    try:
+        while True:
+            print(FQRead(input_file).quality)
+    except: pass
+
+else:
+    try:
+        while True: FQRead(input_file).printFASTQ()
+    except: pass
+

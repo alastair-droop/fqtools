@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+from random import choice
+from sys import exit
+import argparse
+
+version = '1.0 (2016-02-24)'
+
+# Set up & parse the command line arguments:
+parser = argparse.ArgumentParser(description = 'Generate random FASTQ reads', fromfile_prefix_chars='@')
+parser.add_argument('-v', '--version', action='version', version='%(prog)s {0}'.format(version))
+parser.add_argument('-n', '--number', dest='number', type=int, default=1, help='The number of reads to generate')
+parser.add_argument('-b', '--bases', dest='nucleotides', type=str, default='ATGCN', help='The valid nucleotides to use')
+parser.add_argument('-q', '--quality', dest='quality', choices=['sanger', 'solexa', 'illumina'], default='sanger', help='The FASTQ quality encoding method')
+parser.add_argument('-p', '--paired', dest='paired', action='store_true', default=False, help='Should paired files be generated?')
+parser.add_argument('-l', '--lower', dest='length_min', type=int, default=1, help='The minimum read length to generate')
+parser.add_argument('-u', '--upper', dest='length_max', type=int, default=100, help='The maximum read length to generate')
+parser.add_argument('-f', '--filestem', dest='output_filename', type=str, default='output_{}.fastq', help='The output file stem to use.')
+parser.add_argument('-o', '--output', dest='output', choices=['full', 'header', 'sequence', 'header2', 'quality'], default='full', help='part of the read to return')
+args = parser.parse_args()
+
+# Function to return an error:
+def error(message): exit('ERROR: {}'.format(message))
+
+# Function to return a random string from a given character set:
+def randomSequence(characters, n): return ''.join(choice(characters) for _ in range(n))
+
+# Function to print reads to a file:
+def printFullRead(header, sequence, quality, file):
+    print('@{}'.format(header), file=file)
+    print(sequence, file=file)
+    print('+', file=file)
+    print(quality, file=file)
+
+def printHeader(header, sequence, quality, file): print(header, file=file)
+def printSecondaryHeader(header, sequence, quality, file): print('', file=file)
+def printSequence(header, sequence, quality, file): print(sequence, file=file)
+def printQuality(header, sequence, quality, file): print(quality, file=file)
+
+# Get the input characters:
+nucleotide_chars = args.nucleotides
+if args.quality == 'sanger': quality_chars = '''!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'''
+elif args.quality == 'solexa': quality_chars = ''';<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'''
+else: quality_chars = '''@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'''
+
+# Sort the read length range:
+try:
+    length_range = range(args.length_min, args.length_max + 1)
+    if length_range.stop <= length_range.start: raise ValueError()
+    if (length_range.start < 0) or (length_range.stop < 0): raise ValueError()
+except: error('invalid sequence range [{}, {}]'.format(args.length_min, args.length_max))
+
+# Get the pairs:
+if args.paired == True: pairs = (0, 1)
+else: pairs = (0,)
+
+# Sort the header format:
+header_str = ['read_{{:0{}}}:{}'.format(len(str(args.number)), pair + 1) for pair in pairs]
+
+# Open the output files:
+try: output_files = [open(args.output_filename.format(pair + 1), 'wt') for pair in pairs]
+except: error('failed to open output files.')
+
+# Select the read printing function:
+if args.output == 'full': printFunc = printFullRead
+elif args.output == 'header': printFunc = printHeader
+elif args.output == 'sequence': printFunc = printSequence
+elif args.output == 'header2': printFunc = printSecondaryHeader
+else: printFunc = printQuality
+
+# Generate the reads:
+for read_number in range(args.number):
+    read_length = choice(length_range)
+    for pair in pairs:
+        printFunc(header=header_str[pair].format(read_number + 1), sequence=randomSequence(nucleotide_chars, read_length), quality=randomSequence(quality_chars, read_length), file=output_files[pair])
+
+# Close the output files:
+for f in output_files: f.close()
