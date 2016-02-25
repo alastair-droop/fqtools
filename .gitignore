@@ -6,4 +6,5 @@ fqtest
 scratch.c
 tests/test-conversion/temp/*.fastq*
 tests/test-commands/temp/*
+tests/test-commands/command-test.log
 *.o
