@@ -55,6 +55,18 @@ commands = {
     'fasta': {
         'test':'{} -fF fasta {} > {}'.format(fqtools_exec, reference_filename, test_filename),
         'alt':'{} fasta {} > {}'.format(alt_exec, reference_filename, alt_filename)
+    },
+    'basetab': {
+        'test':'{} -dramul -fF basetab -a {} > {}'.format(fqtools_exec, reference_filename, test_filename),
+        'alt':'{} basetab {} > {}'.format(alt_exec, reference_filename, alt_filename)
+    },
+    'qualtab': {
+        'test':'{} -fF qualtab {} > {}'.format(fqtools_exec, reference_filename, test_filename),
+        'alt':'{} qualtab {} > {}'.format(alt_exec, reference_filename, alt_filename)
+    },
+    'lengthtab': {
+        'test':'{} -fF lengthtab {} > {}'.format(fqtools_exec, reference_filename, test_filename),
+        'alt':'{} lengthtab {} > {}'.format(alt_exec, reference_filename, alt_filename)
     }
 }
 
@@ -77,14 +89,17 @@ for test in range(n_tests):
             head_n = random.choice(range(1, 990))
             test_command = test_command.format(head_n)
             alt_command = alt_command.format(head_n * 4)
-        # print('{}: command "{}" test command: "{}"'.format(iteration, command, test_command))
-        # print('{}: command "{}" alt command: "{}"'.format(iteration, command, alt_command))
         runCommand(test_command)
         runCommand(alt_command)
         if fileMD5(test_filename) != fileMD5(alt_filename): result = 'FAILED'
         else: result = 'PASSED'
-        print('{}: command "{}": {}'.format(iteration, command, result))
+        print('{}: command "{}" {}'.format(iteration, command, result))
         if result == 'FAILED':
+            print('{}: command "{}" reference file "{}" checksum is {}'.format(iteration, command, reference_filename, reference_md5))
+            print('{}: command "{}" test file "{}" checksum is {}'.format(iteration, command, test_filename, fileMD5(test_filename)))
+            print('{}: command "{}" alt file "{}" checksum is {}'.format(iteration, command, alt_filename, fileMD5(alt_filename)))
+            print('{}: command "{}" test command is: {}'.format(iteration, command, test_command))
+            print('{}: command "{}" alt command is: {}'.format(iteration, command, alt_command))
             all_passed = False
             if break_on_fail == True: exit('FAILED')
 

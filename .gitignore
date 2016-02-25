@@ -5,4 +5,5 @@ test-fqbuffer
 fqtest
 scratch.c
 tests/test-conversion/temp/*.fastq*
+tests/test-commands/temp/*
 *.o

@@ -8,15 +8,7 @@ version = '1.0 (2016-02-24)'
 # Set up & parse the command line arguments:
 parser = argparse.ArgumentParser(description = 'Basic FASTQ manipulation in Python', fromfile_prefix_chars='@')
 parser.add_argument('-v', '--version', action='version', version='%(prog)s {0}'.format(version))
-# parser.add_argument('-n', '--number', dest='number', type=int, default=1, help='The number of reads to generate')
-# parser.add_argument('-b', '--bases', dest='nucleotides', type=str, default='ATGCN', help='The valid nucleotides to use')
-# parser.add_argument('-q', '--quality', dest='quality', choices=['sanger', 'solexa', 'illumina'], default='sanger', help='The FASTQ quality encoding method')
-# parser.add_argument('-p', '--paired', dest='paired', action='store_true', default=False, help='Should paired files be generated?')
-# parser.add_argument('-l', '--lower', dest='length_min', type=int, default=1, help='The minimum read length to generate')
-# parser.add_argument('-u', '--upper', dest='length_max', type=int, default=100, help='The maximum read length to generate')
-# parser.add_argument('-f', '--filestem', dest='output_filename', type=str, default='output_{}.fastq', help='The output file stem to use.')
-# parser.add_argument('-o', '--output', dest='output', choices=['full', 'header', 'sequence', 'header2', 'quality'], default='full', help='part of the read to return')
-parser.add_argument(dest='command', choices=['view', 'fasta', 'header', 'sequence', 'header2', 'quality'], default='view', help='The command to run')
+parser.add_argument(dest='command', choices=['view', 'fasta', 'header', 'sequence', 'header2', 'quality', 'basetab', 'qualtab', 'lengthtab'], default='view', help='The command to run')
 parser.add_argument(dest='filename', help='The FASTQ file to process')
 args = parser.parse_args()
 
@@ -24,12 +16,15 @@ args = parser.parse_args()
 def error(message): exit('ERROR: {}'.format(message))
 
 class FQRead(object):
+    total_basechars = '''ABCDGHKMNRSTUVWXYabcdghkmnrstuvwxy'''
+    total_qualchars = '''!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'''
     def __init__(self, f):
         self.header = f.readline().strip().lstrip('@')
         if self.header == '': raise Exception()
         self.sequence = f.readline().strip()
         self.header2 = f.readline().strip().lstrip('+')
         self.quality = f.readline().strip()
+    def __len__(self): return len(self.sequence)
     def printFASTQ(self):
         print('@{}'.format(self.header))
         print(self.sequence)
@@ -38,7 +33,17 @@ class FQRead(object):
     def printFASTA(self):
         print('>{}'.format(self.header))
         print(self.sequence)
-        
+    def baseTab(self):
+        output = {}
+        for base in FQRead.total_basechars:
+            output[base] = self.sequence.count(base)
+        return output
+    def qualTab(self):
+        output = {}
+        for base in FQRead.total_qualchars:
+            output[base] = self.quality.count(base)
+        return output
+
 # Open the input file:
 try: input_file = open(args.filename, 'rt')
 except: error('failed to open file "{}"'.format(args.filename))
@@ -71,6 +76,37 @@ elif args.command == 'quality':
         while True:
             print(FQRead(input_file).quality)
     except: pass
+
+elif args.command == 'basetab':
+    totals = {}
+    for base in FQRead.total_basechars: totals[base] = 0
+    try:
+        while True:
+            basetab = FQRead(input_file).baseTab()
+            for base in FQRead.total_basechars: totals[base] += basetab[base]            
+    except: pass
+    for base in FQRead.total_basechars: print('{}\t{}'.format(base, totals[base]))
+
+elif args.command == 'qualtab':
+    totals = {}
+    for base in FQRead.total_qualchars: totals[base] = 0
+    try:
+        while True:
+            basetab = FQRead(input_file).qualTab()
+            for base in FQRead.total_qualchars: totals[base] += basetab[base]            
+    except: pass
+    for base in FQRead.total_qualchars: print('{}\t{}'.format(base, totals[base]))
+
+elif args.command == 'lengthtab':
+    totals = {}
+    try:
+        while True:
+            length = len(FQRead(input_file))
+            if length not in totals.keys(): totals[length] = 1
+            else: totals[length] += 1
+    except: pass
+    for length in sorted(totals.keys()):
+        print('{}\t{}'.format(length, totals[length]))
 
 else:
     try:
