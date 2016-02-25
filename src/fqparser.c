@@ -52,6 +52,7 @@ fqstatus fqparser_init(fqparser *p, fqparser_callbacks *callbacks, fqbytecount i
     p->sequence_length = 0;
     p->quality_length = 0;
     p->line_number = 0;
+    p->error = 0;
     return FQ_STATUS_OK;
 }
 

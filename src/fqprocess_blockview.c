@@ -25,7 +25,6 @@ fqbytecount fqprocess_blockview_readBuffer(fqflag pair, char *b, fqbytecount b_s
 }
 
 void fqcommand_blockview_block(fqflag pair, char *block, fqbytecount block_n, char final){
-    // printf("%d\n", pair);
     fqfsout_write(&f_out, pair, block, block_n);
     if(final == 1){
         if((pair == 0) && (paired == 1)) fqfsout_writechar(&f_out, pair, '\t');
@@ -85,7 +84,7 @@ fqstatus fqprocess_blockview(int argc, const char *argv[], fqglobal options, cha
 		case 2:{callbacks.qualityBlock = fqcommand_blockview_block; break;}
 		case 3:{callbacks.header2Block = fqcommand_blockview_block; break;}
 	}
-
+        
     // Step through the input fileset:
     do finished = fqfsin_step(&f_in);
     while(finished != 1);
