@@ -19,6 +19,6 @@ Output
 
 To perform the tests, run
 
-    ./test-commands
+    ./command-test > command-test.log
 
 Each command will be tested for a random input file multiple times (by default 10,000 times).
