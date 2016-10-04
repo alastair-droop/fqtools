@@ -23,7 +23,7 @@
 
 // Set the current version data:
 #define PROG_NAME "fqtools"
-#define FQTOOLS_VERSION "2.0 2016-01-15"
+#define FQTOOLS_VERSION "2.1 2016-10-04"
 
 // Define the flag type:
 typedef unsigned char fqflag;

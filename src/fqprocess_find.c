@@ -94,7 +94,7 @@ fqstatus fqprocess_find(int argc, const char *argv[], fqglobal options){
 
     //Parse the subcommand options:
     optind++; // Skip the subcommand argument
-    while((option = getopt(argc, (char* const*)argv, "+hkas:o:")) != -1){
+    while((option = getopt(argc, (char* const*)argv, "+hkas:f:o:")) != -1){
         switch(option){
             case 'h':{fqprocess_find_help(); return FQ_STATUS_OK;}
             case 'k':{options.keep_headers = 1; break;}
@@ -104,8 +104,30 @@ fqstatus fqprocess_find(int argc, const char *argv[], fqglobal options){
                 subjects[subject_count] = (char*)malloc(strlen(optarg) * sizeof(char));
                 strcpy(subjects[subject_count], optarg);
                 subject_count++;
-				break;
+			break;
 			}
+            case 'f':{
+                // Reading sequences from file:
+                FILE *seq_file;
+                int bytes_read;
+                fqbytecount line_length = 0;
+                char *line;
+                seq_file = fopen(optarg, "r");
+                if(seq_file == NULL){
+                    fprintf(stderr, "ERROR: failed to read from sequence file \"%s\"\n", optarg);
+                    return FQ_STATUS_FAIL;
+                }
+                while((bytes_read = getline(&line, &line_length, seq_file)) != -1){
+                    if(bytes_read <= 1) continue;
+                    subjects = (char**)realloc(subjects, (subject_count + 1) * sizeof(char*));
+                    subjects[subject_count] = (char*)malloc(bytes_read * sizeof(char));
+                    strncpy(subjects[subject_count], line, bytes_read);
+                    subjects[subject_count][bytes_read - 1] = '\0';
+                    subject_count++;
+                }                
+                fclose(seq_file);
+                break;
+            }
             case 'o':{options.output_filename_specified = 1; options.file_output_stem = optarg; break;}
             default:{fqprocess_find_usage(); return FQ_STATUS_FAIL;}
         }

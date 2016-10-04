@@ -300,6 +300,7 @@ void fqprocess_find_help(){
     printf("  -k               Preserve secondary headers (if present).\n");
     printf("  -a               Require all sequences for a match.\n");
     printf("  -s SEQUENCE      Sequence to match against.\n");
+    printf("  -f SEQ_FILE      Read match sequences from file.\n");
     printf("  -o STEM          Output file stem (default \"output%%\").\n");
     printf("  FILE             The fastq file(s) to view.\n");
     printf("\n");
@@ -309,6 +310,9 @@ void fqprocess_find_help(){
     printf("    for a read to match, otherwise the presence of any one is sufficient.\n");
     printf("    If no sequences are specified, all reads are returned.\n");
     printf("\n");
+    printf("SEQ_FILE:\n");
+    printf("    If specified with -f, sequences are read one per line from file.\n");
+    printf("    Empty lines are ignored.\n");
     printf("STEM:\n");
     printf("    The file stem to use for output files (without file extension). Any\n");
     printf("    instances of the single character specified using the -p global argument\n");
