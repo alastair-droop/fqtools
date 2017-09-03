@@ -62,15 +62,15 @@ The `fqtools` suite contains the following subcommands:
 
 Each subcommand has its own set of arguments. The global arguments are:
 
-* **`-h`**               Show this help message and exit.
-* **`-v`**               Show the program version and exit.
+* **`-h`**               Show this help message and exit
+* **`-v`**               Show the program version and exit
 * **`-d`**               Allow DNA sequence bases       (ACGTN)
 * **`-r`**               Allow RNA sequence bases       (ACGUN)
 * **`-a`**               Allow ambiguous sequence bases (RYKMSWBDHV)
 * **`-m`**               Allow mask sequence base       (X)
 * **`-u`**               Allow uppercase sequence bases
 * **`-l`**               Allow lowercase sequence bases
-* **`-p CHR`**           Set the pair replacement character (default "%")
+* **`-p CHR`**           Set the pair replacement character (default '%')
 * **`-b BUFSIZE`**       Set the input buffer size
 * **`-B BUFSIZE`**       Set the output buffer size
 * **`-q QUALTYPE`**      Set the quality score encoding
