@@ -6,7 +6,7 @@ CFLAGS+=-O2 -g
 CPPFLAGS+=-Wall -Wextra -Wno-unused-parameter -I$(HTSDIR)
 LIBS=-lz -lhts -lm
 
-SUBPROCESSES=view head count blockview fasta basetab qualtab lengthtab type validate find trim qualmap
+SUBPROCESSES=view head count blockview fasta basetab qualtab lengthtab type validate find trim qualmap crisprtab
 SUBPROCESS_FILES=$(addsuffix .c, $(addprefix $(SRC)/fqprocess_, $(SUBPROCESSES)))
 SUBPROCESS_OBJECTS=$(addsuffix .o, $(addprefix $(SRC)/fqprocess_, $(SUBPROCESSES)))
 
