@@ -23,7 +23,7 @@
 
 // Set the current version data:
 #define PROG_NAME "fqtools"
-#define FQTOOLS_VERSION "2.2 2019-05-08"
+#define FQTOOLS_VERSION "2.3 2019-05-08"
 
 // Define the flag type:
 typedef unsigned char fqflag;
@@ -108,6 +108,7 @@ fqstatus fqprocess_validate(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_find(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_trim(int argc, const char *argv[], fqglobal options);
 fqstatus fqprocess_qualmap(int argc, const char *argv[], fqglobal options);
+fqstatus fqprocess_tabseq(int argc, const char *argv[], fqglobal options);
 
 #include "fqbuffer.h"
 #include "fqfile.h"

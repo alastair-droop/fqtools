@@ -71,7 +71,7 @@ void global_help(){
     printf("quality   View FASTQ file quality data\n");
     printf("header2   View FASTQ file secondary header data\n");
     printf("fasta     Convert FASTQ files to FASTA format\n");
-    printf("fasta     Convert FASTQ files to CRISPR tabbed format\n");
+    printf("tabseq    Convert FASTQ files to tabbed sequence format\n");
     printf("basetab   Tabulate FASTQ base frequencies\n");
     printf("qualtab   Tabulate FASTQ quality character frequencies\n");
     printf("lengthtab Tabulate FASTQ read lengths\n");
@@ -134,8 +134,8 @@ void fqprocess_qualmap_usage(){
     printf("usage: %s [...] qualmap [-hk] [-o OUTFILE] MAP [FILE] [FILE]\n", PROG_NAME);
 }
 
-void fqprocess_crisprtab_usage(){
-    printf("usage: %s [...] crisprtab [-h] [FILE] [FILE]\n", PROG_NAME);
+void fqprocess_tabseq_usage(){
+    printf("usage: %s [...] tabseq [-h] [FILE] [FILE]\n", PROG_NAME);
 }
 
 
@@ -380,16 +380,19 @@ void fqprocess_qualmap_help(){
     printf("    If no input file is specified, input will be read from stdin.\n");
 }
 
-void fqprocess_crisprtab_help(){
-    printf("Convert FASTQ files to CRISPR tabbed format.\n");
+void fqprocess_tabseq_help(){
+    printf("Convert FASTQ files to tabbed sequence format.\n");
     printf("\n");
-    printf("crisprtab options:\n");
+    printf("tabseq options:\n");
     printf("  -h               Show this help message and exit.\n");
+    printf("  -t               Attempt to trim read number from header.\n");    
     printf("  FILE             The fastq file(s) to view.\n");
     printf("\n");
     printf("FILE:\n");
     printf("    If no input file is specified, input will be read from stdin.\n");
     printf("\n");
-	printf("The CRISPRtab format is simply <header>\t<seq> for single-end samples,\n");
-	printf("or <header1>\t<seq1>\t<header2>\t<seq2> for paired-end samples.\n");
+	printf("The tabbed sequence format is simply <header>\\t<seq> for single-end samples,\n");
+	printf("or <header1>\\t<seq1>\\t<seq2> for paired-end samples.\n");
+    printf("if -t is specified, the read header will be trimmed of the trailing pair\n");
+    printf("numbers (\"/1\" or \"/2\"), if these are present\n");
 }

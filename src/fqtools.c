@@ -131,7 +131,7 @@ int main(int argc, const char *argv[]){
     if(strcmp(command, "find") == 0) return fqprocess_find(argc, argv, options);
     if(strcmp(command, "trim") == 0) return fqprocess_trim(argc, argv, options);
     if(strcmp(command, "qualmap") == 0) return fqprocess_qualmap(argc, argv, options);
-    if(strcmp(command, "crisprtab") == 0) return fqprocess_crisprtab(argc, argv, options);
+    if(strcmp(command, "tabseq") == 0) return fqprocess_tabseq(argc, argv, options);
     
     //If we get to here, the given command string was invalid:
     fprintf(stderr, "ERROR: unknown command: \"%s\"\n", command);
