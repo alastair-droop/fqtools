@@ -19,7 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <zlib.h>
-#include <htslib/sam.h>
+#include <sam.h>
 
 // Set the current version data:
 #define PROG_NAME "fqtools"
