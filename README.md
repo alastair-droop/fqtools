@@ -24,6 +24,7 @@ If ZLib is already installed, building can be performed similar to the following
     cd fqtools/
     git clone https://github.com/samtools/htslib
     cd htslib/
+    autoheader
     autoconf 
     ./configure
     make
