@@ -9,3 +9,4 @@ script:
  - echo 'Build and check docker image'
  - docker build -t fqtools .
  - docker images | grep -c fqtools
+ - docker run -v $PWD:/fqtools -it fqtools sh -c "cp -r /opt/wsi-t113/fqtools/bin /fqtools/bin && cd /fqtools/tests/test-commands && mkdir temp && ./command-test"
