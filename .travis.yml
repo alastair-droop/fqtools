@@ -1,0 +1,13 @@
+sudo: false
+
+language: ruby
+
+services:
+ - docker
+
+script:
+ - echo 'Build and check docker image'
+ - docker build -t fqtools .
+ - docker images | grep -c fqtools
+ - mkdir $HOME/fqtools && chmod -R 777 $HOME/fqtools
+ - docker run -v $HOME/fqtools:/fqtools -it fqtools sh -c "cp -r /opt/wsi-t113/fqtools/* /fqtools/ && cd /fqtools/tests/test-commands && sed -i \"s:n_tests = 10000:n_tests = 20:\" ./command-test && mkdir temp && ./command-test"

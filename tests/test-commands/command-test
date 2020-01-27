@@ -14,7 +14,7 @@ fqtools_exec = os.path.join('..', '..', 'bin', 'fqtools')
 fqrandom_exec = os.path.join('.', 'random-fastq')
 alt_exec = os.path.join('.', 'process-fastq')
 
-n_tests = 10000
+n_tests = 100
 all_passed = True
 break_on_fail = True
 
