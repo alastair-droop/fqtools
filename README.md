@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/alastair-droop/fqtools.svg?branch=master)](https://travis-ci.org/alastair-droop/fqtools)
-[![Docker Repository on Quay.io](https://quay.io/repository/vaofford/fqtools/status "Docker Repository on Quay.io")](https://quay.io/repository/alastair_droop/fqtools)
+[![Build Status](https://travis-ci.org/alastair-droop/fqtools.svg?branch=develop)](https://travis-ci.org/alastair-droop/fqtools)
+[![Docker Repository on Quay.io](https://quay.io/repository/alastair_droop/fqtools/status "Docker Repository on Quay.io")](https://quay.io/repository/alastair_droop/fqtools)
 [![Install with Bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/fqtools/README.html)
 
 
