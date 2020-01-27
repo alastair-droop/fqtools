@@ -1,0 +1,11 @@
+sudo: false
+
+language: ruby
+
+services:
+ - docker
+
+script:
+ - echo 'Build and check docker image'
+ - docker build -t fqtools .
+ - docker images | grep -c fqtools
