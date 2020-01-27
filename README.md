@@ -1,5 +1,3 @@
-# fqtools 
-
 [![Build Status](https://travis-ci.org/vaofford/fqtools.svg?branch=master)](https://travis-ci.org/vaofford/fqtools)
 [![Docker Repository on Quay.io](https://quay.io/repository/vaofford/fqtools/status "Docker Repository on Quay.io")](https://quay.io/repository/vaofford/fqtools)
 
